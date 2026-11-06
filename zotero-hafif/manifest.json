@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Zotero Hafif",
-  "version": "0.15.0",
-  "description": "Kişisel, tek parça ve hafif Zotero eklentisi: yapay zekâ araştırma asistanı (bütün sağlayıcılar), eylemler ve kısayollar (tam ekran, odak modu, panel aç/kapat, toplu düzenleme, okuma etiketleri, otomatik kurallar), hızlı arama, konu notları, not içindekiler, yüzen not içindekiler, PDF içindekiler, atıf, etiket ve sekme yönetimi, PDF taşıma, yapay zekâ.",
+  "version": "1.0.0",
+  "description": "Tek parça, hafif araştırma, okuma ve yazma eklentisi: yazım projeleri ve dipnotlu Word/Markdown dışa aktarma, İSNAD künye denetimi, vurgu panosu ve tekrar, okuma takibi, nota gönderme, not ve PDF içindekiler, eylem paleti ve kısayollar, yapay zekâ asistanı (bütün sağlayıcılar), anlamsal arama, alıntı doğrulama, literatür arama, MCP sunucusu.",
   "author": "fikhiefendi",
   "applications": {
     "zotero": {
