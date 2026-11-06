@@ -329,25 +329,21 @@ Hafif.modules.embed = {
 			};
 			walk(c);
 		}
-		let D = mem.dims;
-		let v = mem.vec;
-		let scores = new Float32Array(mem.entries.length);
-		for (let i = 0; i < mem.entries.length; i++) {
-			let e = mem.entries[i];
-			if ((kinds && !kinds.includes(e.kind)) || (libraryID && e.lib !== libraryID) || (allowItems && !allowItems.has(e.item))) {
-				scores[i] = -1e9;
-				continue;
-			}
-			let s = 0;
-			let o = i * D;
-			for (let k = 0; k < D; k++) s += v[o + k] * q[k];
-			// Kosinüs benzerliği (vektörler normal): ölçekler geri çarpılır
-			scores[i] = s * e.k * qk;
+		let mask = null;
+		if (kinds || libraryID || allowItems) {
+			mask = new Uint8Array(mem.entries.length);
+			mem.entries.forEach((e, i) => {
+				mask[i] = (kinds && !kinds.includes(e.kind)) || (libraryID && e.lib !== libraryID) || (allowItems && !allowItems.has(e.item)) ? 0 : 1;
+			});
 		}
-		let order = [...scores.keys()].sort((a, b) => scores[b] - scores[a]);
+		// Kosinüs benzerliği (vektörler normal): en iyi adaylar, büyük dizinde ayrı iş parçacığında
+		let top = await this._top(mem, q, qk, mask, Math.max(500, limit * 40));
+		let scores = {};
+		top.idx.forEach((i, j) => {
+			scores[i] = top.score[j];
+		});
 		let byItem = new Map();
-		for (let i of order) {
-			if (scores[i] <= -1e9) break;
+		for (let i of top.idx) {
 			let e = mem.entries[i];
 			let key = e.lib + "/" + e.item;
 			let g = byItem.get(key);
@@ -360,6 +356,84 @@ Hafif.modules.embed = {
 			if (byItem.size >= limit && [...byItem.values()].every(x => x.hits.length >= 3)) break;
 		}
 		return { results: [...byItem.values()] };
+	},
+
+	// ---- Puanlama ----
+
+	WORKER_MIN: 4000,
+	_worker: null,
+	_workerMem: null,
+	_reqs: new Map(),
+	_reqID: 0,
+
+	_vec() {
+		if (!this._vecLib) {
+			let scope = {};
+			Services.scriptloader.loadSubScript("chrome://hafif/content/windows/vecmath.js", scope);
+			this._vecLib = scope.HafifVec;
+		}
+		return this._vecLib;
+	},
+
+	_scales(mem) {
+		if (!mem._scales) mem._scales = Float32Array.from(mem.entries, e => e.k);
+		return mem._scales;
+	},
+
+	/** En yüksek puanlı `top` girdi. Küçük dizinde doğrudan, büyükte işçide hesaplanır. */
+	async _top(mem, q, qk, mask, top) {
+		let n = mem.entries.length;
+		if (n >= this.WORKER_MIN) {
+			try {
+				return await this._workerTop(mem, q, qk, mask, top);
+			}
+			catch (e) {
+				Zotero.debug("[Hafif] anlamsal arama işçisi kullanılamadı, ana iş parçacığında: " + e.message);
+			}
+		}
+		return this._vec().topScores(mem.vec, mem.dims, n, this._scales(mem), q, qk, mask, top);
+	},
+
+	_ensureWorker() {
+		if (this._worker) return this._worker;
+		let win = Zotero.getMainWindow();
+		let W = win?.ChromeWorker || win?.Worker;
+		if (!W) throw new Error("işçi oluşturulamıyor");
+		let w = new W("chrome://hafif/content/windows/embedworker.js");
+		w.onmessage = (e) => {
+			let m = e.data;
+			if (m.type !== "result") return;
+			let r = this._reqs.get(m.req);
+			if (!r) return;
+			this._reqs.delete(m.req);
+			if (m.error) r.reject(new Error(m.error));
+			else r.resolve({ idx: new Int32Array(m.idx), score: new Float32Array(m.score) });
+		};
+		w.onerror = (e) => {
+			for (let r of this._reqs.values()) r.reject(new Error(e.message || "işçi hatası"));
+			this._reqs.clear();
+			this._worker = null;
+			this._workerMem = null;
+		};
+		this._worker = w;
+		return w;
+	},
+
+	_workerTop(mem, q, qk, mask, top) {
+		let w = this._ensureWorker();
+		if (this._workerMem !== mem) {
+			let vec = mem.vec.slice();
+			let scales = this._scales(mem).slice();
+			w.postMessage({ type: "load", id: mem.at + ":" + mem.entries.length, vec: vec.buffer, scales: scales.buffer, dims: mem.dims, n: mem.entries.length }, [vec.buffer, scales.buffer]);
+			this._workerMem = mem;
+		}
+		let req = ++this._reqID;
+		return new Promise((resolve, reject) => {
+			this._reqs.set(req, { resolve, reject });
+			let qq = Int8Array.from(q);
+			let mm = mask ? mask.slice() : null;
+			w.postMessage({ type: "search", req, id: mem.at + ":" + mem.entries.length, q: qq.buffer, qk, mask: mm?.buffer || null, top }, mm ? [qq.buffer, mm.buffer] : [qq.buffer]);
+		});
 	},
 
 	/** Kütüphane değişince (ayar açıksa) birkaç dakika sonra sessizce günceller. */
@@ -380,6 +454,8 @@ Hafif.modules.embed = {
 	},
 
 	shutdown() {
+		this._worker?.terminate();
+		this._worker = null;
 		Zotero.getMainWindow()?.clearTimeout(this._autoTimer);
 	},
 };

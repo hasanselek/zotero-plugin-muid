@@ -9,7 +9,7 @@ Hafif.modules.mcp = {
 	PATH: "/hafif/mcp",
 	PROTOCOLS: ["2025-06-18", "2025-03-26", "2024-11-05"],
 	READ_TOOLS: ["search_library", "fulltext_search", "semantic_search", "get_item", "read_document", "search_in_document",
-		"list_collections", "list_collection_items", "list_tags", "search_notes", "read_note", "find_annotations", "view_page"],
+		"list_collections", "list_collection_items", "list_tags", "search_notes", "read_note", "find_annotations", "view_page", "verify_quote"],
 
 	enabled() {
 		return Hafif.pref("mcpEnabled") === true;

@@ -52,6 +52,63 @@ var HafifPrefsAI = {
 		fill();
 	},
 
+	// ---- Kullanım ----
+
+	async initUsage() {
+		let U = this.Hafif.load("usage");
+		let sel = this.$("hafif-usageMonth");
+		let months = await U.months();
+		if (!months.includes(U.month())) months.unshift(U.month());
+		for (let m of months) {
+			let o = this.h("option", null, m);
+			o.value = m;
+			sel.append(o);
+		}
+		sel.addEventListener("change", () => this.renderUsage());
+		this.renderUsage();
+	},
+
+	async renderUsage() {
+		let U = this.Hafif.load("usage");
+		let box = this.$("hafif-usage");
+		box.replaceChildren();
+		let rows = await U.report(this.$("hafif-usageMonth").value);
+		let prices = U.prices();
+		let total = 0;
+		let priced = false;
+		if (!rows.length) box.append(this.h("div", "hf-empty", "Bu ay kullanım yok."));
+		for (let r of rows) {
+			let line = this.h("div", "hf-rule");
+			let name = this.h("b", null, r.key);
+			name.style.minWidth = "220px";
+			let info = this.h("span", "w", `${r.calls} çağrı · giriş ${U.fmtTokens(r.input)} · çıkış ${U.fmtTokens(r.output)}${r.cacheRead ? ` · önbellek ${U.fmtTokens(r.cacheRead)}` : ""}`);
+			info.style.flex = "1";
+			let pin = this.h("input");
+			let pout = this.h("input");
+			for (let [inp, i, ph] of [[pin, 0, "giriş $/M"], [pout, 1, "çıkış $/M"]]) {
+				inp.type = "number";
+				inp.step = "0.01";
+				inp.min = "0";
+				inp.style.width = "6.5em";
+				inp.placeholder = ph;
+				inp.value = prices[r.key]?.[i] ?? "";
+				inp.addEventListener("change", () => {
+					let empty = pin.value === "" && pout.value === "";
+					U.setPrice(r.key, empty ? null : pin.value, empty ? null : pout.value);
+					this.renderUsage();
+				});
+			}
+			let cost = this.h("span", "hf-ok", r.cost != null ? `≈ $${r.cost.toFixed(2)}` : "");
+			if (r.cost != null) {
+				total += r.cost;
+				priced = true;
+			}
+			line.append(name, info, pin, pout, cost);
+			box.append(line);
+		}
+		this.$("hafif-usageTotal").textContent = priced ? `Tahmini toplam: $${total.toFixed(2)}` : "";
+	},
+
 	// ---- Yapay zekâ sağlayıcıları ----
 
 	initAI() {

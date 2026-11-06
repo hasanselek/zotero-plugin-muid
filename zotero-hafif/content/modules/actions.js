@@ -37,6 +37,9 @@ Hafif.modules.actions = {
 			{ id: "aiOCR", group: "ai", items: true, name: "Taranmış PDF'i metne çevir (OCR)", desc: "Metin katmanı olmayan sayfaları görsel destekli modelle okur ve saklar; sonra aranabilir ve asistan tarafından okunabilir.", run: (c) => Hafif.load("tables").ocrAction(c.win, c.items) },
 			{ id: "litSearch", group: "ai", name: "Literatür ara…", desc: "YÖK Tez, DergiPark, TDV İslâm Ansiklopedisi ve OpenAlex'te tez türü, alan, yıl ve dil süzgeçleriyle (ya da doğal dilde) arar; sonuçları künyesi ve PDF'iyle ekler.", run: () => Hafif.load("sources").open() },
 			{ id: "aiMeta", group: "ai", items: true, name: "Künyeyi PDF'ten çıkar (YZ)", desc: "Seçili PDF'lerin ilk sayfalarından ve künye sayfasından künyeyi çıkarır; üst kaydı olmayan PDF'e kayıt oluşturur, olanı düzeltir (onaylı).", run: (c) => A.aiMeta(c) },
+			{ id: "aiVerify", group: "ai", items: true, name: "Nottaki alıntıları kaynağında doğrula", desc: "Seçili notta atıfla biten tırnaklı alıntıları kaynağın PDF'inde arar: metin var mı, gösterilen sayfada mı?", run: ({ win, items }) => Hafif.load("verify").verifyNote(win, items.find(i => i.isNote())) },
+			{ id: "aiRelated", group: "ai", items: true, name: "İlgili kaynaklar ve notlar (anlamca)", desc: "Seçili notun ya da kaydın içeriğine anlamca yakın kayıtları, notları ve PDF bölümlerini anlamsal dizinden bulur.", run: (c) => A.related(c) },
+			{ id: "aiMatrix", group: "ai", name: "Literatür tarama matrisi…", desc: "Seçili kayıtları (ya da açık koleksiyonu) araştırma sorusu, yöntem, kaynaklar, bulgular ve katkı/eksik sütunlarında sayfa atıflı bir tabloya döker.", run: (c) => A.aiMatrix(c) },
 			{ id: "aiSummarize", group: "ai", name: "Asistanla özetle", desc: "Açık PDF'i ya da seçili kaydı özetletir.", run: ({ win }) => Hafif.load("chat").show(win, { prompt: "Bunu özetle: ana iddia, yöntem, temel bulgular ve sonuç; her noktaya sayfa atfı ver.", send: true }) },
 
 			// Yazma
@@ -233,6 +236,57 @@ Hafif.modules.actions = {
 			prompt: `Şu ${items.length} kaydı build_table ile karşılaştır (keys: ${keys}). Sütunlar: ${list.join(" | ")}. Tabloyu göster, sonra ortak noktaları ve ayrılıkları kısaca değerlendir.`,
 			send: true,
 		});
+	},
+
+	MATRIX: "Araştırma sorusu; Yöntem ve kaynaklar; Temel bulgular / tez; Katkısı; Eksik ya da tartışmalı yönü",
+
+	aiMatrix(c) {
+		let items = this._regular(c.items);
+		if (items.length < 2 && c.collection) items = c.collection.getChildItems(false, false).filter(i => i.isRegularItem());
+		if (!items.length) return Hafif.toast("Kayıt seçin ya da bir koleksiyon açın.");
+		if (items.length > 40) {
+			if (!Services.prompt.confirm(c.win, "Literatür tarama matrisi", `${items.length} kayıt var; ilk 40'ı alınsın mı? (Her kayıt ayrı ayrı okunur.)`)) return;
+			items = items.slice(0, 40);
+		}
+		let cols = this._prompt(c.win, "Literatür tarama matrisi", `${items.length} kayıt. Sütunları noktalı virgülle ayırın:`, this.MATRIX);
+		if (!cols) return;
+		let list = cols.split(/[;\n]/).map(s => s.trim()).filter(Boolean);
+		Hafif.load("chat").show(c.win, {
+			prompt: `Literatür tarama matrisi: şu ${items.length} kaydı build_table ile karşılaştır (keys: ${items.map(i => i.key).join(", ")}). Sütunlar: ${list.join(" | ")}. Tabloyu göster; ardından literatürdeki ana eğilimleri, boşlukları ve bu boşluklardan çıkabilecek araştırma sorularını kısaca yaz.`,
+			send: true,
+		});
+	},
+
+	async related({ win, items }) {
+		let E = Hafif.load("embed");
+		if (!E.config()) return Hafif.toast("Önce anlamsal dizini kurun (Ayarlar › Hafif › Yapay zekâ › Anlamsal arama dizini).", 5000);
+		let src = items[0];
+		let text = src.isNote()
+			? Hafif.load("notedoc")._parse(src.getNote()).body.textContent
+			: [src.getField("title"), src.getField("abstractNote")].filter(Boolean).join("\n");
+		text = text.replace(/\s+/g, " ").trim().slice(0, 2000);
+		if (text.length < 20) return Hafif.toast("İçerik çok kısa.");
+		let r = await E.search(text, { limit: 20, libraryID: src.libraryID });
+		if (r.error) return Hafif.toast(r.error, 5000);
+		let self = src.isNote() ? src.parentItem?.key || src.key : src.key;
+		let entries = [];
+		for (let g of r.results || []) {
+			if (g.item === self) continue;
+			let it = Zotero.Items.getByLibraryAndKey(g.lib, g.item);
+			if (!it) continue;
+			let hit = g.hits[0];
+			let where = hit.kind === "note" ? "not" : hit.page ? `s. ${hit.page}` : "künye/özet";
+			entries.push({ title: it.getDisplayTitle(), meta: `${Math.round(g.score * 100)}% · ${where} · ${(hit.text || "").slice(0, 120)}`, data: { it, hit } });
+		}
+		if (!entries.length) return Hafif.toast("Anlamca yakın kayıt bulunamadı.");
+		let pick = await this._pick(win, `“${(src.isNote() ? src.getNoteTitle() : src.getDisplayTitle()).slice(0, 60)}” ile anlamca ilgili`, entries);
+		if (!pick) return;
+		if (pick.hit.kind !== "note" && pick.hit.att && pick.hit.page) {
+			let att = Zotero.Items.getByLibraryAndKey(pick.it.libraryID, pick.hit.att);
+			if (att) return Zotero.Reader.open(att.id, { pageIndex: Math.max(0, +pick.hit.page - 1) });
+		}
+		win.Zotero_Tabs.select("zotero-pane");
+		await win.ZoteroPane.selectItem(pick.it.id);
 	},
 
 	// ---- Görünüm ----

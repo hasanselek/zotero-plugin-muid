@@ -207,9 +207,11 @@ Hafif.modules.llm = {
 		let p = this.provider(opts.provider);
 		if (!p) throw new Error("Sağlayıcı bulunamadı: " + opts.provider);
 		if (p.key && !p.apiKey && !p.custom) throw new Error(`${p.label} için API anahtarı yok. Zotero Ayarları › Hafif › Yapay zekâ bölümünden girin.`);
-		if (p.format === "anthropic") return this._anthropic(p, opts);
-		if (p.format === "gemini") return this._gemini(p, opts);
-		return this._openai(p, opts);
+		let res = p.format === "anthropic" ? await this._anthropic(p, opts)
+			: p.format === "gemini" ? await this._gemini(p, opts)
+				: await this._openai(p, opts);
+		Hafif.load("usage").record(p.id, opts.model, res?.usage);
+		return res;
 	},
 
 	/** SSE akışını satır satır okur; her "data:" yükü için fn(json, eventName) çağrılır. */
@@ -575,7 +577,6 @@ Hafif.modules.llm = {
 	/** Bağlantı denemesi: model listesi çekilebiliyorsa anahtar ve adres doğrudur. */
 	async test(providerID) {
 		if (this.PROVIDERS[providerID]?.embedOnly) {
-			let p = this.provider(providerID);
 			await Hafif.load("embed").embed(["deneme"], { cfg: { provider: providerID, model: Hafif.load("embed").DEFAULTS[providerID]?.model, dims: null } });
 			return "Bağlantı çalışıyor.";
 		}

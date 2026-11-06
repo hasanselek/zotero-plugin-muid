@@ -14,7 +14,6 @@ const MAX_LIVE = 14;
 let doc = null;
 let task = null;
 let token = 0;
-let seq = 0;
 let observer = null;
 let resizer = null;
 let live = new Map();

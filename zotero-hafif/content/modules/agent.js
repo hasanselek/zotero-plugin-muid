@@ -19,6 +19,7 @@ Nasıl çalışırsın:
 - Bir PDF'in künyesi eksik/yanlışsa ya da üst kaydı yoksa extract_metadata ile künyeyi PDF'ten çıkar.
 - Birbirinden bağımsız aramaları aynı adımda paralel yap.
 - Bir iddiayı kaynağa dayandırıyorsan önce o kaynağın ilgili sayfasını gerçekten oku.
+- Kullanıcının metnindeki ya da senin vereceğin doğrudan alıntılardan şüphe edersen verify_quote ile kaynağında ve sayfasında denetle.
 
 Atıf kuralı (zorunlu):
 - Kütüphanedeki bir kaynağa dayanan her cümlenin sonuna atıf koy. En iyisi cümle düzeyinde atıftır: [[ANAHTAR, s. 12, "dayanak cümleden 5-20 kelime"]] — tırnak içindeki metin, read_document çıktısındaki metnin harfi harfine kopyası olmalı (kullanıcı tıklayınca PDF'te tam o cümle vurgulanır). Alıntı veremiyorsan [[ANAHTAR, s. 12]], sayfa da bilinmiyorsa [[ANAHTAR]].
@@ -140,7 +141,7 @@ Yanıt biçimi:
 
 	/** Bütün araçlar: okuyanlar (libtools) ve değiştirenler (libedit). */
 	tools() {
-		return [...Hafif.load("libtools").tools(), ...Hafif.load("research").tools(), ...Hafif.load("sources").tools(), ...Hafif.load("tables").tools(), ...Hafif.load("metaextract").tools(), ...Hafif.load("libedit").tools()];
+		return [...Hafif.load("libtools").tools(), ...Hafif.load("research").tools(), ...Hafif.load("sources").tools(), ...Hafif.load("tables").tools(), ...Hafif.load("metaextract").tools(), ...Hafif.load("verify").tools(), ...Hafif.load("libedit").tools()];
 	},
 
 	// ---- Döngü ----
@@ -151,7 +152,7 @@ Yanıt biçimi:
 	 */
 	async run(thread, userText, { context, images = [], signal, on = {} } = {}) {
 		let llm = Hafif.load("llm");
-		let T = Hafif.load("libtools");
+		Hafif.load("libtools");
 		let { provider, model } = thread.model || llm.current();
 		thread.model = { provider, model };
 		let tools = this.tools();

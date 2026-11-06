@@ -343,6 +343,18 @@ Hafif = {
 				},
 				{
 					menuType: "menuitem",
+					l10nID: "hafif-verify-quotes",
+					onShowing: (ev, ctx) => ctx.setVisible(ctx.items?.length === 1 && ctx.items[0].isNote()),
+					onCommand: this.safe((ev, ctx) => this.load("verify").verifyNote(Zotero.getMainWindow(), ctx.items[0])),
+				},
+				{
+					menuType: "menuitem",
+					l10nID: "hafif-related-notes",
+					onShowing: (ev, ctx) => ctx.setVisible(ctx.items?.length === 1 && !!this.pref("aiEmbed") && (ctx.items[0].isNote() || ctx.items[0].isRegularItem())),
+					onCommand: this.safe((ev, ctx) => this.load("actions").related({ win: Zotero.getMainWindow(), items: ctx.items })),
+				},
+				{
+					menuType: "menuitem",
 					l10nID: "hafif-move-files",
 					onShowing: (ev, ctx) => ctx.setVisible(!!ctx.items?.length && this.load("move").storedAttachments(ctx.items).length > 0),
 					onCommand: this.safe((ev, ctx) => this.load("move").run(ctx.items)),

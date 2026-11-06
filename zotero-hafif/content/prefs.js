@@ -88,6 +88,7 @@ var HafifPrefs = {
 		});
 
 		this.initAI();
+		this.initUsage();
 		this.initMCP();
 		this.initActions();
 		this.initRules();

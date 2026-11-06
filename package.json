@@ -6,7 +6,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "lint": "eslint zotero-hafif",
+    "lint": "eslint --max-warnings 0 zotero-hafif",
     "check": "node scripts/check.mjs",
     "test": "node --test tests/*.test.mjs",
     "build": "sh zotero-hafif/build.sh",

@@ -212,6 +212,52 @@ Hafif.modules.selftest = {
 			return info + `, sağlayıcılar: ${llm.configured().join(", ") || "(yok)"}`;
 		});
 
+		await test("uyumluluk katmanı ve yerelleştirme", async () => {
+			let C = Hafif.load("compat");
+			assert(C.major() >= 7, "Zotero sürümü okunamadı");
+			assert(Array.isArray(C.noteEditors()), "not düzenleyicileri okunamadı");
+			let label = Hafif.t("hafif-hub");
+			assert(label && label !== "hafif-hub", "çeviri bulunamadı");
+			return `Zotero ${Zotero.version}, parola yöneticisi: ${Hafif.load("secrets").available() ? "var" : "YOK"}`;
+		});
+
+		await test("vurgu sorgusu, okuma ve tekrar", async () => {
+			let A = Hafif.load("annots");
+			let list = await A.query({ limit: 20 });
+			let due = await A.dueToday();
+			let reading = await Hafif.load("reading").all();
+			return `${list.length} vurgu (ilk 20), tekrar: ${due.due.length + due.fresh.length}, okuma kaydı: ${reading.length}`;
+		});
+
+		await test("künye denetimi (yazmadan)", async () => {
+			let items = (await Zotero.Items.getAll(Zotero.Libraries.userLibraryID, true)).filter(i => i.isRegularItem()).slice(0, 100);
+			let report = Hafif.load("lint").checkItems(items);
+			return `${items.length} kayıttan ${report.length} tanesinde uyarı`;
+		});
+
+		await test("not çözümleme ve Word çıktısı (diske yazmadan)", async () => {
+			let notes = (await Zotero.Items.getAll(Zotero.Libraries.userLibraryID, false)).filter(i => i.isNote()).slice(0, 5);
+			if (!notes.length) return "not yok, atlandı";
+			let D = Hafif.load("notedoc");
+			let E = Hafif.load("export");
+			let n = notes.find(x => x.getNote().includes("citation")) || notes[0];
+			let doc = await D.parse(n.getNote());
+			let fmt = await E.formatCitations(doc.blocks, E.styleFor(n));
+			let parts = E.buildDocx(doc, fmt);
+			let x = new (Zotero.getMainWindow().DOMParser)().parseFromString(parts["word/document.xml"], "application/xml");
+			assert(!x.querySelector("parsererror"), "document.xml bozuk");
+			let quotes = Hafif.load("verify").extractQuotes(doc.blocks);
+			return `${doc.blocks.length} blok, ${fmt.strings.length} atıf, ${quotes.length} doğrulanabilir alıntı`;
+		});
+
+		await test("Hafif Merkezi açılıp kapanıyor", async () => {
+			let w = Hafif.load("hub").open("annots");
+			await waitFor(() => w.HafifHub?.tab === "annots");
+			for (let [id] of Hafif.modules.hub.TABS) w.HafifHub.show(id);
+			await wait(500);
+			w.close();
+		});
+
 		await test("ayarlar sayfası kaydı", async () => {
 			assert(Zotero.PreferencePanes.pluginPanes.some(p => p.pluginID === Hafif.id), "kayıtlı değil");
 		});

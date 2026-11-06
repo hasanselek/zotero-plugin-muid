@@ -73,7 +73,7 @@ async function chars(id, pageIndex) {
 	let raw = "";
 	tc.items.forEach((it, idx) => {
 		if (!it.str) return;
-		let [a, b, c, d, e, f] = it.transform;
+		let [, , c, d, e, f] = it.transform;
 		let fontH = Math.hypot(c, d) || it.height || 10;
 		let w = it.width || 0;
 		let n = [...it.str].length;

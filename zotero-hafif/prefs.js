@@ -66,3 +66,5 @@ pref("extensions.hafif.reviewNew", 10);
 pref("extensions.hafif.reviewColors", "");
 // Hafif Merkezi'nde son açılan sekme
 pref("extensions.hafif.hubTab", "annots");
+// Model fiyatları (1 milyon belirteç başına giriş/çıkış, kullanıcı girer; JSON)
+pref("extensions.hafif.aiPrices", "");
