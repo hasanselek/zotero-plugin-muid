@@ -155,7 +155,7 @@ Hafif.modules.notes = {
 			...annotation,
 			type: "highlight",
 			color: annotation.color || "#ffd400",
-			attachmentItemID: reader._item.id,
+			attachmentItemID: Hafif.load("compat").readerItem(reader).id,
 			id: Zotero.DataObjectUtilities.generateKey(),
 		};
 		return this._enqueue(target, async () => [json]);

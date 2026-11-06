@@ -6,6 +6,7 @@
 Hafif.modules.actions = {
 	GROUPS: [
 		["ai", "Yapay zekâ"],
+		["write", "Yazma"],
 		["view", "Görünüm"],
 		["read", "Okuma etiketleri"],
 		["edit", "Toplu düzenleme"],
@@ -37,6 +38,20 @@ Hafif.modules.actions = {
 			{ id: "litSearch", group: "ai", name: "Literatür ara…", desc: "YÖK Tez, DergiPark, TDV İslâm Ansiklopedisi ve OpenAlex'te tez türü, alan, yıl ve dil süzgeçleriyle (ya da doğal dilde) arar; sonuçları künyesi ve PDF'iyle ekler.", run: () => Hafif.load("sources").open() },
 			{ id: "aiMeta", group: "ai", items: true, name: "Künyeyi PDF'ten çıkar (YZ)", desc: "Seçili PDF'lerin ilk sayfalarından ve künye sayfasından künyeyi çıkarır; üst kaydı olmayan PDF'e kayıt oluşturur, olanı düzeltir (onaylı).", run: (c) => A.aiMeta(c) },
 			{ id: "aiSummarize", group: "ai", name: "Asistanla özetle", desc: "Açık PDF'i ya da seçili kaydı özetletir.", run: ({ win }) => Hafif.load("chat").show(win, { prompt: "Bunu özetle: ana iddia, yöntem, temel bulgular ve sonuç; her noktaya sayfa atfı ver.", send: true }) },
+
+			// Yazma
+			{ id: "projectNew", group: "write", name: "Yeni yazım projesi…", desc: "Makale, tez, bölüm ya da tebliğ için kaynak koleksiyonu + bölümlü taslak notu + atıf stili kurar; vurgular doğrudan taslağa gider.", run: ({ win }) => Hafif.load("project").create(win) },
+			{ id: "projectSwitch", group: "write", name: "Yazım projesine geç…", desc: "Etkin projeyi seçer; taslağı açar ve vurgu gönderme hedefi yapar.", run: ({ win }) => Hafif.load("project").switch(win) },
+			{ id: "projectAdd", group: "write", items: true, name: "Etkin projeye kaynak olarak ekle", desc: "Seçili kayıtları etkin projenin koleksiyonuna koyar.", run: (c) => Hafif.load("project").addSources(c) },
+			{ id: "projectStatus", group: "write", name: "Proje durumu…", desc: "Sözcük sayısı, bölümler, atıflar; atıf yapılmamış ve koleksiyonda olmayan kaynaklar.", run: ({ win }) => Hafif.load("project").status(win) },
+			{ id: "projectBib", group: "write", name: "Proje kaynakçasını yenile", desc: "Taslaktaki atıflardan, projenin stiliyle “Kaynakça” bölümünü yeniden yazar.", run: ({ win }) => Hafif.load("project").updateBibliography(win) },
+			{ id: "projectExport", group: "write", name: "Proje taslağını dışa aktar (Word / Markdown)…", desc: "Taslağı dipnotlu .docx, Pandoc Markdown ya da zengin metin olarak verir.", run: ({ win }) => Hafif.load("project").exportDraft(win) },
+			{ id: "projectStyle", group: "write", name: "Projenin atıf stilini değiştir…", desc: "Etkin projenin kaynakça ve dışa aktarmada kullandığı CSL stili.", run: ({ win }) => Hafif.load("project").changeStyle(win) },
+			{ id: "exportNote", group: "write", items: true, name: "Notu dışa aktar (Word / Markdown)…", desc: "Seçili notu atıfları biçimlenmiş olarak dışa aktarır (dipnot stillerinde gerçek Word dipnotları).", run: ({ win, items }) => Hafif.load("export").exportNote(win, items.find(i => i.isNote())) },
+			{ id: "citekeyAssign", group: "write", items: true, auto: true, name: "Atıf anahtarı ata (Pandoc/LaTeX)", desc: "Anahtarı olmayan kayıtlara yazarYılKelime biçiminde tekil anahtar yazar (Better BibTeX gerekmez).", run: (c) => Hafif.load("citekey").assign(A._regular(c.items), { quiet: !!c.auto }) },
+			{ id: "citekeyCopy", group: "write", items: true, name: "Atıf anahtarını kopyala (@anahtar)", desc: "Seçili kayıtların Pandoc atıf anahtarlarını panoya kopyalar.", run: (c) => Hafif.load("citekey").copy(A._regular(c.items)) },
+			{ id: "lint", group: "edit", name: "Künye denetimi (İSNAD)…", desc: "Seçili kayıtlarda, açık koleksiyonda ya da bütün kütüphanede eksik alan, büyük harf, ISBN/DOI, tarih, dil ve transkripsiyon sorunlarını bulur.", run: ({ win }) => Hafif.load("lint").run(win) },
+			{ id: "lintFix", group: "edit", items: true, auto: true, name: "Künyeyi güvenle düzelt", desc: "Fazla boşluk, sondaki nokta, DOI öneki, dil adı → kodu, büyük harfli başlık/yazar düzeltmeleri.", run: async (c) => { let n = await Hafif.load("lint").fix(A._regular(c.items)); if (!c.auto) Hafif.toast(n ? `${n} kayıt düzeltildi.` : "Düzeltilecek bir şey yok."); } },
 
 			// Görünüm
 			{ id: "fullscreen", group: "view", name: "Tam ekran", desc: "Zotero penceresini tam ekrana alır ya da çıkarır.", run: ({ win }) => A.fullscreen(win) },
@@ -103,7 +118,7 @@ Hafif.modules.actions = {
 		}
 	},
 
-	DEFAULT_KEYS: { aiChat: "accel+J", litSearch: "accel+alt+L", focus: "accel+alt+F", leftPane: "accel+alt+ArrowLeft", rightPane: "accel+alt+ArrowRight", palette: "accel+shift+K" },
+	DEFAULT_KEYS: { projectSwitch: "accel+alt+P", aiChat: "accel+J", litSearch: "accel+alt+L", focus: "accel+alt+F", leftPane: "accel+alt+ArrowLeft", rightPane: "accel+alt+ArrowRight", palette: "accel+shift+K" },
 
 	/** Kayıtlı kısayollar varsayılanların üstüne yazılır; silinen kısayol "" olarak saklanır. */
 	keys() { return Object.assign({}, this.DEFAULT_KEYS, this._json("actionKeys", {})); },

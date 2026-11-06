@@ -336,6 +336,12 @@ Hafif = {
 				},
 				{
 					menuType: "menuitem",
+					l10nID: "hafif-export-note",
+					onShowing: (ev, ctx) => ctx.setVisible(ctx.items?.length === 1 && ctx.items[0].isNote()),
+					onCommand: this.safe((ev, ctx) => this.load("export").exportNote(Zotero.getMainWindow(), ctx.items[0])),
+				},
+				{
+					menuType: "menuitem",
 					l10nID: "hafif-move-files",
 					onShowing: (ev, ctx) => ctx.setVisible(!!ctx.items?.length && this.load("move").storedAttachments(ctx.items).length > 0),
 					onCommand: this.safe((ev, ctx) => this.load("move").run(ctx.items)),
@@ -380,6 +386,10 @@ Hafif = {
 				{ menuType: "menuitem", l10nID: "hafif-tab-manager", onCommand: this.safe(() => this.load("tabs").toggle(Zotero.getMainWindow())) },
 				action("palette", "hafif-action-palette"),
 				action("litSearch", "hafif-lit-search"),
+				{ menuType: "separator" },
+				action("projectNew", "hafif-project-new"),
+				action("projectSwitch", "hafif-project-switch"),
+				action("lint", "hafif-lint"),
 				{ menuType: "separator" },
 				{ menuType: "menuitem", l10nID: "hafif-open-toc", onCommand: this.safe(() => this.load("toc").open()) },
 				{

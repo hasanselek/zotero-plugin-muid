@@ -53,3 +53,6 @@ pref("extensions.hafif.litLast", "");
 pref("extensions.hafif.litAI", true);
 // Asistanın kullanıcıyı tanıdığı profil (boşsa varsayılan)
 pref("extensions.hafif.aiProfile", "");
+// Yazım projeleri (JSON) ve etkin proje
+pref("extensions.hafif.projects", "");
+pref("extensions.hafif.activeProject", "");
