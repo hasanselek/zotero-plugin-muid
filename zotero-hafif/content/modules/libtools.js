@@ -792,9 +792,9 @@ Hafif.modules.libtools = {
 			let reader = Zotero.Reader.getByTabID(tabs.selectedID);
 			let att = reader && Zotero.Items.get(reader.itemID);
 			if (att) {
-				let st = reader._internalReader?._state;
-				let page = st?.primaryViewStats?.pageIndex;
-				let label = st?.primaryViewStats?.pageLabel;
+				let pg = Hafif.load("compat").readerPage(reader);
+				let page = pg?.index;
+				let label = pg?.label;
 				return { kind: "reader", attachment: att, item: this.top(att), page: page != null ? page + 1 : null, pageLabel: label };
 			}
 		}

@@ -25,7 +25,7 @@ Hafif.modules.notetoc = {
 
 	/** Açık bütün düzenleyiciler (eklenti sonradan açıldığında ya da ayar değişince). */
 	attachAll() {
-		for (let inst of Zotero.Notes._editorInstances || []) {
+		for (let inst of Hafif.load("compat").noteEditors()) {
 			inst._initPromise?.then(() => this.attach(inst)).catch(() => {});
 		}
 	},

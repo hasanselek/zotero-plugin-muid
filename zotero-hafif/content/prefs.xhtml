@@ -238,6 +238,10 @@
 		<html:div class="hf-sub">Dış literatür</html:div>
 		<html:label class="hf-check"><html:input type="checkbox" id="hafif-aiExternal"/><html:span>Gerektiğinde kütüphane dışındaki literatürde ara <html:span class="hf-help">(OpenAlex: 250 milyonu aşkın akademik eser, atıf ağı ve açık erişim bağlantıları; ücretsiz, anahtar gerekmez. Yalnızca arama sözcükleri gönderilir.)</html:span></html:span></html:label>
 
+		<html:div class="hf-sub">Araştırmacı profili</html:div>
+		<html:textarea id="hafif-aiProfile" style="font-family: inherit; min-height: 50px"></html:textarea>
+		<html:div class="hf-help">Asistan sizi bu tanımla tanır: alanınız, çalıştığınız diller, kütüphanenizin içeriği. Boş bırakırsanız varsayılan (İslâm ilimleri) kullanılır.</html:div>
+
 		<html:div class="hf-sub">Kalıcı talimatlar</html:div>
 		<html:textarea id="hafif-aiInstructions" placeholder="Ör. Atıfları İSNAD 2. edisyona göre ver. Arapça alıntıların Türkçe çevirisini de ekle. Hicrî tarihleri miladî karşılıklarıyla yaz." style="font-family: inherit; min-height: 70px"></html:textarea>
 		<html:div class="hf-help">Her sohbette asistana verilir.</html:div>
@@ -253,5 +257,10 @@
 			<html:span id="hafif-io-msg" class="hf-ok"></html:span>
 		</html:div>
 		<html:div class="hf-help">Dışa aktarma bütün Hafif ayarlarını (API anahtarı hariç) panoya JSON olarak kopyalar; başka bilgisayara taşımak ya da yedeklemek için.</html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-perf">Performans raporu</html:button>
+		</html:div>
+		<html:pre id="hafif-perf-out" class="hf-help" style="white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace" hidden="true"></html:pre>
+		<html:div class="hf-help">API anahtarları Zotero'nun parola yöneticisinde saklanır (ayar dosyasında açık metin olarak durmaz).</html:div>
 	</html:section>
 </vbox>

@@ -68,7 +68,7 @@ Hafif.modules.actions = {
 			{ id: "copyCitation", group: "copy", items: true, name: "Dipnot/atıf olarak kopyala", desc: "Seçili kayıtların atfı.", run: (c) => A.copyCite(c.items, true) },
 			{ id: "copyLink", group: "copy", items: true, name: "Zotero bağlantısını kopyala", desc: "zotero://select bağlantısı: Word, Obsidian ya da notlarda tıklayınca kayıt seçilir.", run: (c) => A.copyLinks(c.items, "select") },
 			{ id: "copyPDFLink", group: "copy", items: true, name: "PDF açma bağlantısını kopyala", desc: "zotero://open-pdf bağlantısı; okuyucuda açıksa bulunduğunuz sayfayla.", run: (c) => A.copyLinks(c.items, "pdf", c.reader) },
-			{ id: "showFile", group: "copy", items: true, name: "Dosyayı Finder'da göster", desc: "İlk ekin dosyasını Finder'da gösterir.", run: (c) => A.showFile(c) },
+			{ id: "showFile", group: "copy", items: true, name: `Dosyayı ${Hafif.load("compat").fileManagerName()} içinde göster`, desc: "İlk ekin dosyasını bilgisayarınızdaki klasöründe gösterir.", run: (c) => A.showFile(c) },
 
 			// Düzen
 			{ id: "toCollection", group: "org", items: true, name: "Yeni koleksiyona koy…", desc: "Ad verdiğiniz yeni bir koleksiyon kurar ve seçili kayıtları içine ekler.", run: (c) => A.toNewCollection(c) },
@@ -255,11 +255,11 @@ Hafif.modules.actions = {
 	},
 
 	_readerSidebarOpen(reader) {
-		return !!reader?._internalReader?._state?.sidebarOpen;
+		return Hafif.load("compat").readerSidebarOpen(reader);
 	},
 
 	_setReaderSidebar(reader, open) {
-		reader?._internalReader?.toggleSidebar(open);
+		Hafif.load("compat").toggleReaderSidebar(reader, open);
 	},
 
 	leftPane(win) {
@@ -620,7 +620,7 @@ Hafif.modules.actions = {
 			else {
 				let att = reader ? Zotero.Items.get(reader.itemID) : Zotero.Items.get(it.getAttachments().find(id => Zotero.Items.get(id)?.isPDFAttachment()));
 				if (!att) continue;
-				let page = reader?._internalReader?._state?.primaryViewStats?.pageIndex;
+				let page = reader ? Hafif.load("compat").readerPage(reader)?.index : null;
 				links.push(`zotero://open-pdf/${this._libPath(att)}/items/${att.key}` + (page != null ? `?page=${page + 1}` : ""));
 			}
 		}

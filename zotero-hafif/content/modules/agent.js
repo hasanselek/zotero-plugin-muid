@@ -5,7 +5,10 @@
 Hafif.modules.agent = {
 	MAX_STEPS: 25,
 
-	SYSTEM: `Sen Zotero içinde çalışan bir araştırma asistanısın. Kullanıcı İslâm ilimleri ve fıkıh tarihi alanında çalışan bir akademisyen; kütüphanesi Türkçe, Arapça ve Batı dillerinde kaynaklar içerir.
+	/** Ayarlar › Yapay zekâ › Araştırmacı profili boşsa kullanılır. */
+	DEFAULT_PROFILE: "Kullanıcı İslâm ilimleri ve fıkıh tarihi alanında çalışan bir akademisyen; kütüphanesi Türkçe, Arapça ve Batı dillerinde kaynaklar içerir.",
+
+	SYSTEM: `Sen Zotero içinde çalışan bir araştırma asistanısın. {{profile}}
 
 Nasıl çalışırsın:
 - Önce kullanıcının kendi kütüphanesine bak. Soru kütüphanedeki kaynaklarla ilgiliyse araçları kullan; genel bilgiyle yetinme.
@@ -131,7 +134,8 @@ Yanıt biçimi:
 	system() {
 		let extra = (Hafif.pref("aiInstructions") || "").trim();
 		let today = new Date().toLocaleDateString("tr-TR", { year: "numeric", month: "long", day: "numeric" });
-		return this.SYSTEM + `\n\nBugünün tarihi: ${today}.` + (extra ? `\n\nKullanıcının kalıcı talimatları:\n${extra}` : "");
+		let profile = (Hafif.pref("aiProfile") || "").trim() || this.DEFAULT_PROFILE;
+		return this.SYSTEM.replace("{{profile}}", () => profile) + `\n\nBugünün tarihi: ${today}.` + (extra ? `\n\nKullanıcının kalıcı talimatları:\n${extra}` : "");
 	},
 
 	/** Bütün araçlar: okuyanlar (libtools) ve değiştirenler (libedit). */

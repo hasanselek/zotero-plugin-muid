@@ -53,19 +53,38 @@ Hafif.modules.llm = {
 		}
 	},
 
+	/** Sağlayıcı anahtarları: parola yöneticisindekiler, taşınamamış eski ayarların üstüne. */
 	keys() {
 		let k = this._json("aiKeys", {});
 		// Eski tek anahtar ayarı
 		if (!k.anthropic && Hafif.pref("aiKey")) k.anthropic = Hafif.pref("aiKey");
+		for (let [name, v] of Object.entries(Hafif.load("secrets").all())) {
+			if (name.startsWith("provider:") && v) k[name.slice(9)] = v;
+		}
 		return k;
 	},
 
-	setKey(provider, value) {
+	async setKey(provider, value) {
+		let S = Hafif.load("secrets");
 		let k = this._json("aiKeys", {});
-		if (value) k[provider] = value;
+		if (await S.set("provider:" + provider, value)) {
+			delete k[provider];
+			if (provider === "anthropic") Hafif.pref("aiKey", "");
+		}
+		else if (value) k[provider] = value;
 		else delete k[provider];
-		Hafif.pref("aiKeys", JSON.stringify(k));
-		if (provider === "anthropic") Hafif.pref("aiKey", value || "");
+		Hafif.pref("aiKeys", Object.keys(k).length ? JSON.stringify(k) : "");
+	},
+
+	customKey(c) {
+		return Hafif.load("secrets").get("custom:" + c.id) || c.key || "";
+	},
+
+	/** Özel uç noktanın anahtarı; kaydedilemezse eski yerinde (aiCustom) kalır. */
+	async setCustomKey(c, value) {
+		if (await Hafif.load("secrets").set("custom:" + c.id, value)) c.key = "";
+		else c.key = value;
+		c.hasKey = !!value;
 	},
 
 	bases() {
@@ -82,7 +101,7 @@ Hafif.modules.llm = {
 		let p = this.PROVIDERS[id];
 		if (p) return { id, ...p, base: (this.bases()[id] || p.base).replace(/\/+$/, ""), apiKey: this.keys()[id] || "" };
 		let c = this.custom().find(x => x.id === id);
-		if (c) return { id, label: c.label || c.base, format: c.format || "openai", base: (c.base || "").replace(/\/+$/, ""), key: !!c.key, apiKey: c.key || "", custom: true };
+		if (c) return { id, label: c.label || c.base, format: c.format || "openai", base: (c.base || "").replace(/\/+$/, ""), key: !!(c.hasKey || c.key), apiKey: this.customKey(c), custom: true };
 		return null;
 	},
 
