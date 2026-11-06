@@ -232,6 +232,7 @@ Hafif.modules.lint = {
 		if (!report.length) return Hafif.toast(`${label}: sorun bulunmadı (${items.length} kayıt).`, 3000);
 		let fixable = report.filter(r => r.issues.some(i => i.fix)).length;
 		let entries = [];
+		entries.push({ title: "▤ Ayrıntılı rapor (Hafif Merkezi)", meta: "kayıt kayıt sorunlar, tek tek düzeltme", data: { hub: true } });
 		if (fixable) entries.push({ title: `✓ Düzeltilebilenleri düzelt (${fixable} kayıt)`, meta: "boşluk, nokta, DOI öneki, dil kodu, büyük harf", data: { fixAll: true } });
 		for (let r of report) {
 			let worst = r.issues.find(i => i.level === "error") || r.issues.find(i => i.level === "warn") || r.issues[0];
@@ -239,6 +240,7 @@ Hafif.modules.lint = {
 		}
 		let pick = await Hafif.load("actions")._pick(win, `Künye denetimi — ${label}: ${report.length} kayıtta sorun`, entries);
 		if (!pick) return;
+		if (pick.hub) return Hafif.load("hub").open("lint");
 		if (pick.fixAll) {
 			let n = await this.fix(report.map(r => r.item));
 			return Hafif.toast(`${n} kayıt düzeltildi. Kalanlar elle bakılmalı.`, 3500);

@@ -153,6 +153,7 @@ Hafif = {
 		if ((this.pref("aiKeys") && this.pref("aiKeys") !== "{}") || this.pref("aiKey") || /"key":\s*"[^"]/.test(this.pref("aiCustom") || "")) {
 			this.load("secrets").migrate().catch(e => Zotero.logError(e));
 		}
+		if (this.pref("readingTrack") !== false) this.safe(() => this.load("reading").start())();
 		this.perf.startup = Math.round((this._now() - t0) * 10) / 10;
 		this.log(`açılış: ${this.perf.startup} ms`);
 		if (this.pref("selfTest")) {
@@ -385,6 +386,7 @@ Hafif = {
 				{ menuType: "menuitem", l10nID: "hafif-tag-browser", onCommand: this.safe(() => this.load("tags").toggle(Zotero.getMainWindow())) },
 				{ menuType: "menuitem", l10nID: "hafif-tab-manager", onCommand: this.safe(() => this.load("tabs").toggle(Zotero.getMainWindow())) },
 				action("palette", "hafif-action-palette"),
+				action("hub", "hafif-hub"),
 				action("litSearch", "hafif-lit-search"),
 				{ menuType: "separator" },
 				action("projectNew", "hafif-project-new"),
@@ -424,6 +426,7 @@ Hafif = {
 				action("focus", "hafif-view-focus"),
 				action("leftPane", "hafif-view-left"),
 				action("rightPane", "hafif-view-right"),
+				action("sideBySide", "hafif-view-side-by-side"),
 				{ menuType: "separator" },
 				{
 					menuType: "menuitem",
@@ -601,5 +604,19 @@ Hafif = {
 			onRender: () => {},
 			onAsyncRender: this.safe(async (props) => this.load("cite").render(props)),
 		});
+		if (this.pref("readingSection") !== false) {
+			Zotero.ItemPaneManager.registerSection({
+				paneID: "hafif-reading",
+				pluginID: this.id,
+				header: { l10nID: "hafif-reading-header", icon: icon("reading") },
+				sidenav: { l10nID: "hafif-reading-sidenav", icon: icon("reading") },
+				onItemChange: ({ item, setEnabled }) => {
+					setEnabled(!!item?.isRegularItem() && item.numAttachments() > 0);
+					return true;
+				},
+				onRender: () => {},
+				onAsyncRender: this.safe(async (props) => this.load("reading").render(props)),
+			});
+		}
 	},
 };

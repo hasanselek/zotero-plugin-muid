@@ -691,6 +691,8 @@ Hafif.modules.libtools = {
 				sayfa: an.annotationPageLabel, renk: this.COLORS[(an.annotationColor || "").toLowerCase()] || an.annotationColor,
 				eklendi: an.dateAdded?.slice(0, 10),
 			};
+			let anlam = Hafif.load("annots").meaning(an.annotationColor);
+			if (anlam) r.renk_anlamı = anlam;
 			if (an.annotationText) r.metin = an.annotationText;
 			if (an.annotationComment) r.yorum = an.annotationComment;
 			let tags = an.getTags().map(t => t.tag);

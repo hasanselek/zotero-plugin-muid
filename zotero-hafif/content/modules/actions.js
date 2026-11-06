@@ -8,7 +8,7 @@ Hafif.modules.actions = {
 		["ai", "Yapay zekâ"],
 		["write", "Yazma"],
 		["view", "Görünüm"],
-		["read", "Okuma etiketleri"],
+		["read", "Okuma"],
 		["edit", "Toplu düzenleme"],
 		["copy", "Kopyala ve bağlantı"],
 		["org", "Düzen"],
@@ -59,9 +59,14 @@ Hafif.modules.actions = {
 			{ id: "rightPane", group: "view", name: "Sağ paneli aç/kapat", desc: "Kütüphanede kayıt bilgisi paneli; okuyucuda notlar ve bilgi paneli.", run: ({ win }) => A.rightPane(win) },
 			{ id: "focus", group: "view", name: "Odak modu", desc: "Tam ekran ve iki panel kapalı; yalnızca metin. Tekrar basınca eski düzen geri gelir.", run: ({ win }) => A.focusMode(win) },
 			{ id: "leftFloat", group: "view", name: "Yüzer sol panel (aç/kapat)", desc: "Koleksiyon paneli yer kaplamaz; sekme çubuğunun solundaki düğme her sekmede (PDF, EPUB, not) koleksiyonları ve eserleri gösteren küçük bir çerçeve açar.", run: () => Hafif.load("leftfloat").toggleEnabled() },
+			{ id: "sideBySide", group: "view", name: "Yan yana oku…", desc: "İki eseri (ör. Arapça metin ve tercümesi, şerh ve metin) ekranı ikiye bölerek yan yana açar.", run: (c) => A.sideBySide(c) },
 			{ id: "tagSelector", group: "view", name: "Etiket seçiciyi aç/kapat", desc: "Sol alttaki etiket kutusunu gizler ya da gösterir.", run: ({ win }) => win.ZoteroPane.toggleTagSelector() },
 
-			// Okuma etiketleri
+			// Okuma
+			{ id: "hub", group: "read", name: "Hafif Merkezi", desc: "Vurgular, tekrar, okuma istatistikleri, yazım projeleri ve künye denetimi tek pencerede.", run: () => Hafif.load("hub").open() },
+			{ id: "annotations", group: "read", name: "Vurgu panosu", desc: "Bütün kütüphanedeki vurgu ve notlar: renge, türe, metne, tarihe ve koleksiyona göre süzme; nota gönderme, Markdown'a aktarma.", run: () => Hafif.load("hub").open("annots") },
+			{ id: "review", group: "read", name: "Günün vurgu tekrarı", desc: "Aralıklı tekrar: eski vurgularınızdan her gün birkaçı yeniden önünüze gelir.", run: () => Hafif.load("hub").open("review") },
+			{ id: "readingStats", group: "read", name: "Okuma istatistikleri", desc: "Hangi eseri ne kadar okudunuz, ilerleme, son okuma; son iki haftanın günlük okuması.", run: () => Hafif.load("hub").open("reading") },
 			{ id: "markToRead", group: "read", items: true, auto: true, name: "Okunacak olarak işaretle", desc: "Okunacak etiketini ekler; okunuyor/okundu etiketlerini kaldırır.", run: (c) => A.readState(c.items, "toRead") },
 			{ id: "markReading", group: "read", items: true, auto: true, name: "Okunuyor olarak işaretle", desc: "Okunuyor etiketini ekler; okunacak/okundu etiketlerini kaldırır.", run: (c) => A.readState(c.items, "reading") },
 			{ id: "markRead", group: "read", items: true, auto: true, name: "Okundu olarak işaretle", desc: "Okundu etiketini ekler; okunacak/okunuyor etiketlerini kaldırır.", run: (c) => A.readState(c.items, "read") },
@@ -319,6 +324,49 @@ Hafif.modules.actions = {
 		if (reader) this._setReaderSidebar(reader, false);
 		let key = this.prettyKey(this.keys().focus);
 		Hafif.toast("Odak modu" + (key ? ` — çıkmak için ${key}` : ""), 1800);
+	},
+
+	/** İki eseri yan yana açar: ana pencere solda, ikinci eser ayrı okuyucu penceresinde sağda. */
+	async sideBySide({ win, items, reader }) {
+		let pdfOf = (it) => {
+			if (!it) return null;
+			if (it.isFileAttachment?.()) return it;
+			let id = it.getAttachments?.().find(a => Zotero.Items.get(a)?.isFileAttachment());
+			return id ? Zotero.Items.get(id) : null;
+		};
+		let tops = this._regular(items);
+		let first = reader ? Zotero.Items.get(reader.itemID) : pdfOf(tops[0]);
+		let second = reader ? null : pdfOf(tops[1]);
+		if (!second) {
+			let tabs = (win.Zotero_Tabs?._tabs || []).filter(t => t.type?.startsWith("reader") && t.data?.itemID && t.data.itemID !== first?.id);
+			let entries = tabs.map(t => ({ title: t.title, meta: "açık sekme", data: Zotero.Items.get(t.data.itemID) }));
+			let col = win.ZoteroPane?.getSelectedCollection?.();
+			for (let it of (col ? col.getChildItems(false, false) : []).filter(i => i.isRegularItem())) {
+				let p = pdfOf(it);
+				if (p && p.id !== first?.id && !entries.some(e => e.data?.id === p.id)) entries.push({ title: it.getDisplayTitle(), meta: col.name, data: p });
+			}
+			if (!entries.length) return Hafif.toast("Yan yana açmak için iki kayıt seçin ya da ikinci eseri bir sekmede açın.", 4000);
+			second = await this._pick(win, "Yanına hangi eser açılsın?", entries);
+			if (!second) return;
+		}
+		if (!first) return Hafif.toast("Açık ya da seçili bir PDF yok.");
+		let scr = win.screen;
+		let half = Math.floor(scr.availWidth / 2);
+		win.fullScreen = false;
+		win.moveTo(scr.availLeft, scr.availTop);
+		win.resizeTo(half, scr.availHeight);
+		if (!reader) await Zotero.Reader.open(first.id);
+		let r2 = await Zotero.Reader.open(second.id, null, { openInWindow: true });
+		let w2 = Hafif.load("compat").readerWindow(r2);
+		if (w2) {
+			let place = () => {
+				w2.moveTo(scr.availLeft + half, scr.availTop);
+				w2.resizeTo(scr.availWidth - half, scr.availHeight);
+			};
+			if (w2.document.readyState === "complete") place();
+			else w2.addEventListener("load", place, { once: true });
+			w2.setTimeout(place, 400);
+		}
 	},
 
 	// ---- Etiketler ----

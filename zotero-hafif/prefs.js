@@ -56,3 +56,13 @@ pref("extensions.hafif.aiProfile", "");
 // Yazım projeleri (JSON) ve etkin proje
 pref("extensions.hafif.projects", "");
 pref("extensions.hafif.activeProject", "");
+// Okuma: takip, sağ panel bölümü, otomatik etiketler; renk anlamları; vurgu tekrarı
+pref("extensions.hafif.readingTrack", true);
+pref("extensions.hafif.readingSection", true);
+pref("extensions.hafif.readingAutoState", true);
+pref("extensions.hafif.readingAutoRead", false);
+pref("extensions.hafif.colorMeanings", "");
+pref("extensions.hafif.reviewNew", 10);
+pref("extensions.hafif.reviewColors", "");
+// Hafif Merkezi'nde son açılan sekme
+pref("extensions.hafif.hubTab", "annots");

@@ -47,6 +47,7 @@
 	</html:style>
 
 	<html:p class="hf-intro">Hafif'in bütün ayarları burada. Değişiklikler hemen kaydedilir; Zotero'yu yeniden başlatmak gerekmez.</html:p>
+	<html:div class="hf-row"><html:input id="hafif-pref-search" type="search" placeholder="Ayarlarda ara… (ör. kısayol, renk, anahtar, okuma)" style="flex: 1"/></html:div>
 	<html:div class="hf-nav" id="hafif-nav"></html:div>
 
 	<!-- Eylemler ve kısayollar -->
@@ -80,6 +81,25 @@
 			<html:label for="hafif-tag-reading">Okunuyor</html:label><html:input id="hafif-tag-reading"/>
 			<html:label for="hafif-tag-read">Okundu</html:label><html:input id="hafif-tag-read"/>
 		</html:div>
+	</html:section>
+
+	<!-- Okuma -->
+	<html:section class="hf-card" id="hf-sec-reading" data-title="Okuma ve vurgular">
+		<html:h2>❖ Okuma ve vurgular</html:h2>
+		<html:p class="hf-lead">Renklerin sizin için ne anlama geldiği vurgu panosunda, nota gönderilen alıntılarda ({{meaning}}) ve asistanın vurgu aramalarında kullanılır. Okuma takibi hangi eseri ne kadar okuduğunuzu yalnızca bu bilgisayarda tutar.</html:p>
+		<html:div class="hf-sub">Renk anlamları</html:div>
+		<html:div class="hf-tags" id="hafif-colors"></html:div>
+		<html:div class="hf-sub">Okuma takibi</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingTrack"/><html:span>Okuma süresini ve görülen sayfaları kaydet <html:span class="hf-help">(Zotero öndeyken ve son iki dakikada etkinseniz; veri: Zotero veri klasörü › hafif/reading.json)</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingSection"/><html:span>Sağ panelde “Okuma” bölümünü göster <html:span class="hf-help">(Zotero yeniden başlayınca)</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingAutoState"/><html:span>%10'u okununca “okunuyor” etiketini kendiliğinden ver</html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingAutoRead"/><html:span>%95'i okununca “okundu” etiketini kendiliğinden ver</html:span></html:label>
+		<html:div class="hf-sub">Vurgu tekrarı</html:div>
+		<html:div class="hf-row">
+			<html:label for="hafif-reviewNew">Günde yeni vurgu</html:label>
+			<html:input id="hafif-reviewNew" type="number" min="0" max="100" style="width: 5em"/>
+		</html:div>
+		<html:div class="hf-help">Hatırladığınız vurgular 1, 3, 7, 16 ve 35 gün sonra yeniden gelir; hatırlamadıklarınız ertesi gün.</html:div>
 	</html:section>
 
 	<!-- MCP -->
@@ -120,7 +140,7 @@
 
 		<html:div class="hf-sub">Alıntı biçimi</html:div>
 		<html:textarea id="hafif-quoteTemplate"></html:textarea>
-		<html:div class="hf-help">Kullanılabilenler: {{highlight}} vurgulanan metin, {{citation}} atıf, {{comment}} yorumunuz, {{tags}}, {{color}}. Koşul: {{if comment}}…{{endif}}. <html:a id="hafif-quote-reset" href="#">Varsayılana dön</html:a></html:div>
+		<html:div class="hf-help">Kullanılabilenler: {{highlight}} vurgulanan metin, {{citation}} atıf, {{comment}} yorumunuz, {{tags}}, {{color}}, {{meaning}} rengin anlamı. Koşul: {{if comment}}…{{endif}}. <html:a id="hafif-quote-reset" href="#">Varsayılana dön</html:a></html:div>
 
 		<html:div class="hf-sub">Not şablonları</html:div>
 		<html:div class="hf-help">Araçlar › Şablondan yeni not ile kullanılır. {{başlık}} ve {{tarih}} doldurulur.</html:div>

@@ -18,6 +18,7 @@ Hafif.modules.litview = {
 		st.style = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
 		st.style.textContent = `
 #hafif-tb-litsearch { list-style-image: url("chrome://hafif/content/icons/litsearch.svg"); fill: currentColor; -moz-context-properties: fill, fill-opacity; }
+#hafif-tb-hub { list-style-image: url("chrome://hafif/content/icons/hub.svg"); fill: currentColor; -moz-context-properties: fill, fill-opacity; }
 #hafif-tb-litsearch[checked="true"] { background: var(--fill-quinary, #8883); border-radius: 5px; }
 #hafif-litview { flex: 1; min-height: 0; min-width: 0; width: 100%; border: 0; background: var(--material-background, Canvas); }`;
 		doc.documentElement.append(st.style);
@@ -27,6 +28,14 @@ Hafif.modules.litview = {
 		b.setAttribute("tabindex", "-1");
 		b.setAttribute("tooltiptext", "Literatür ara (YÖK Tez, DergiPark, TDV İslâm Ansiklopedisi, OpenAlex)");
 		note.after(b);
+		// Hafif Merkezi: vurgular, tekrar, okuma, projeler, künye denetimi
+		let hub = st.hubButton = doc.createXULElement("toolbarbutton");
+		hub.id = "hafif-tb-hub";
+		hub.className = "zotero-tb-button";
+		hub.setAttribute("tabindex", "-1");
+		hub.setAttribute("tooltiptext", "Hafif Merkezi — vurgular, tekrar, okuma, yazım projeleri, künye denetimi");
+		hub.addEventListener("command", Hafif.safe(() => Hafif.load("hub").open()));
+		b.after(hub);
 		let on = (t, type, fn, opts) => {
 			if (!t) return;
 			t.addEventListener(type, fn, opts);
@@ -47,6 +56,7 @@ Hafif.modules.litview = {
 		this.close(win);
 		for (let [t, type, fn, opts] of st.listeners) t.removeEventListener(type, fn, opts);
 		st.button?.remove();
+		st.hubButton?.remove();
 		st.frame?.remove();
 		st.style?.remove();
 		this._state.delete(win);

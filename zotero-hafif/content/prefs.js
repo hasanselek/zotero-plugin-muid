@@ -97,7 +97,45 @@ var HafifPrefs = {
 		this.initPanel();
 		this.initIO();
 		this.initPerf();
+		this.initReading();
 		return true;
+	},
+
+	initReading() {
+		let Hafif = this.Hafif;
+		let check = (id, key, def) => {
+			let el = this.$(id);
+			let v = this.pref(key);
+			el.checked = v === undefined ? def : !!v;
+			el.addEventListener("change", () => {
+				this.pref(key, el.checked);
+				if (key === "readingTrack") {
+					if (el.checked) Hafif.load("reading").start();
+					else Hafif.modules.reading?.stop();
+				}
+			});
+		};
+		check("hafif-readingTrack", "readingTrack", true);
+		check("hafif-readingSection", "readingSection", true);
+		check("hafif-readingAutoState", "readingAutoState", true);
+		check("hafif-readingAutoRead", "readingAutoRead", false);
+		let rn = this.$("hafif-reviewNew");
+		rn.value = this.pref("reviewNew") ?? 10;
+		rn.addEventListener("change", () => this.pref("reviewNew", Math.max(0, Math.min(100, parseInt(rn.value, 10) || 0))));
+		let A = Hafif.load("annots");
+		let box = this.$("hafif-colors");
+		let meanings = A.meanings();
+		for (let [hex, name] of A.COLORS) {
+			let lab = this.h("label", null);
+			let dot = this.h("span");
+			dot.style.cssText = `display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: ${hex}; margin-inline-end: 6px; vertical-align: -1px;`;
+			lab.append(dot, document.createTextNode(name));
+			let input = this.h("input");
+			input.value = meanings[hex] || "";
+			input.placeholder = "anlamı yok";
+			input.addEventListener("change", () => A.setMeaning(hex, input.value.trim()));
+			box.append(lab, input);
+		}
 	},
 
 	initPerf() {
@@ -128,7 +166,19 @@ var HafifPrefs = {
 		this.pref(key, JSON.stringify(value));
 	},
 
+	/** Ayarlarda arama: eşleşmeyen bölümler gizlenir (harekeden ve Türkçe harflerden bağımsız). */
+	initSearch() {
+		let S = this.Hafif.load("search");
+		let input = this.$("hafif-pref-search");
+		let sections = [...document.querySelectorAll("#hafif-prefs section[data-title]")];
+		input.addEventListener("input", () => {
+			let q = S.normalize(input.value.trim());
+			for (let sec of sections) sec.hidden = !!q && !S.normalize(sec.textContent + " " + [...sec.querySelectorAll("input, textarea")].map(i => i.placeholder || "").join(" ")).includes(q);
+		});
+	},
+
 	buildNav() {
+		this.initSearch();
 		let nav = this.$("hafif-nav");
 		for (let sec of document.querySelectorAll("#hafif-prefs section[data-title]")) {
 			let a = this.h("a", null, sec.dataset.title);
