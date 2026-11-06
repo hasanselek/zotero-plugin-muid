@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="tr" windowtype="hafif:litsearch">
+<head>
+	<meta charset="utf-8"/>
+	<title>Literatür Ara</title>
+	<link rel="stylesheet" href="chrome://hafif/content/windows/litsearch.css"/>
+	<script src="chrome://zotero/content/include.js"></script>
+	<script src="chrome://hafif/content/windows/litsearch.js"></script>
+</head>
+<body>
+	<header id="top">
+		<div id="qrow">
+			<input id="q" type="search" dir="auto" placeholder="Ne arıyorsunuz? Ör. “2015 sonrası İslâm hukukunda vakıf üzerine doktora tezleri” ya da yalnızca “istihsan”"/>
+			<label id="ai-wrap" title="Doğal dildeki isteği yapay zekâ süzgeçlere çevirir"><input type="checkbox" id="ai"/> ✦ Doğal dil</label>
+			<button id="go" class="primary">Ara</button>
+		</div>
+		<div id="interp" class="hidden"></div>
+		<div id="filters">
+			<div class="srcs" id="srcs"></div>
+			<label>Tür <select id="docType">
+				<option value="any">Hepsi</option><option value="thesis">Tez</option><option value="article">Makale</option>
+				<option value="encyclopedia">Ansiklopedi maddesi</option><option value="book">Kitap</option>
+			</select></label>
+			<label>Tez türü <select id="thesisType">
+				<option value="any">Hepsi</option><option value="yl">Yüksek lisans</option><option value="doktora">Doktora</option>
+			</select></label>
+			<label>Alan <select id="field"></select></label>
+			<label>Yıl <input id="yearFrom" type="number" min="1900" max="2100" placeholder="—"/> – <input id="yearTo" type="number" min="1900" max="2100" placeholder="—"/></label>
+			<label>Dil <select id="language">
+				<option value="any">Hepsi</option><option value="tr">Türkçe</option><option value="ar">Arapça</option><option value="en">İngilizce</option>
+			</select></label>
+			<label>Nerede <select id="searchIn">
+				<option value="all">Her yerde</option><option value="title">Başlıkta</option><option value="abstract">Özette</option>
+				<option value="keywords">Anahtar kelimede</option><option value="author">Yazarda</option><option value="advisor">Danışmanda (tez)</option>
+			</select></label>
+			<label class="chk"><input id="fullTextOnly" type="checkbox"/> Yalnızca tam metni olanlar</label>
+		</div>
+	</header>
+	<nav id="tabs"></nav>
+	<main id="main">
+		<section id="list"><div id="empty">Aramak için yukarıya yazın. Kaynakları, türü, alanı ve yıl aralığını süzgeçlerden seçebilirsiniz.</div></section>
+		<aside id="detail" class="hidden"></aside>
+	</main>
+	<footer id="bottom">
+		<label>Eklenecek yer <select id="target"></select></label>
+		<span id="status"></span>
+		<button id="addSel" class="primary" disabled="disabled">Seçilenleri ekle</button>
+	</footer>
+</body>
+</html>

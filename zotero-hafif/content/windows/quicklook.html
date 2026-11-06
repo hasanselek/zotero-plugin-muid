@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+	<meta charset="utf-8"/>
+	<title>Hızlı Bakış</title>
+	<style>
+		:root { color-scheme: light dark; --bg: #e9e7e2; --page-shadow: 0 1px 3px rgba(0,0,0,.18), 0 4px 14px rgba(0,0,0,.08); --muted: #77726a; --ink: #23211c; --card: #fffdf8; }
+		@media (prefers-color-scheme: dark) { :root { --bg: #1c1b19; --page-shadow: 0 1px 3px rgba(0,0,0,.6); --muted: #9b958a; --ink: #ece8df; --card: #2a2925; } }
+		html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
+		#scroll { position: absolute; inset: 0; overflow: auto; scroll-behavior: auto; }
+		#pages { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 18px 18px 40px; }
+		.page { position: relative; background: #fff; box-shadow: var(--page-shadow); flex: none; }
+		.page canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+		.page .n { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 10.5px; color: var(--muted); }
+		#msg { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; padding: 30px; text-align: center; }
+		#msg.hidden, .hidden { display: none !important; }
+		#frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+		#img { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; overflow: auto; }
+		#img img { max-width: 100%; max-height: 100%; box-shadow: var(--page-shadow); }
+		#card { position: absolute; inset: 0; overflow: auto; }
+		#card .in { max-width: 640px; margin: 36px auto; background: var(--card); border-radius: 10px; padding: 26px 30px; box-shadow: var(--page-shadow); }
+		#card h1 { font: 600 20px/1.3 "Iowan Old Style", Charter, Georgia, "Geeza Pro", serif; margin: 0 0 6px; }
+		#card .meta { color: var(--muted); margin-bottom: 14px; }
+		#card .abs { font: 15px/1.65 "Iowan Old Style", Charter, Georgia, "Geeza Pro", serif; white-space: pre-wrap; }
+		#card dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; margin: 14px 0 0; font-size: 12px; }
+		#card dt { color: var(--muted); }
+		#card dd { margin: 0; }
+		#pager { position: absolute; right: 14px; bottom: 12px; font-size: 11px; color: #fff; background: rgba(0,0,0,.55); padding: 2px 9px; border-radius: 10px; font-variant-numeric: tabular-nums; pointer-events: none; transition: opacity .3s; }
+	</style>
+	<script src="chrome://hafif/content/windows/quicklook-view.js"></script>
+	<script type="module" src="chrome://hafif/content/windows/quicklook.mjs"></script>
+</head>
+<body>
+	<div id="scroll" class="hidden"><div id="pages"></div></div>
+	<div id="img" class="hidden"></div>
+	<div id="card" class="hidden"></div>
+	<iframe id="frame" class="hidden" sandbox=""></iframe>
+	<div id="msg">Yükleniyor…</div>
+	<div id="pager" class="hidden"></div>
+</body>
+</html>

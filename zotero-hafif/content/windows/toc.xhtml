@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="tr" windowtype="hafif:toc">
+<head>
+	<meta charset="utf-8"/>
+	<title>Not İçindekiler</title>
+	<link rel="stylesheet" href="chrome://hafif/content/windows/toc.css"/>
+	<script src="chrome://zotero/content/include.js"></script>
+	<script src="chrome://hafif/content/windows/toc.js"></script>
+</head>
+<body>
+	<aside id="notes">
+		<div class="pane-head">
+			<input id="filter" type="search" placeholder="Notlarda ara…" dir="auto"/>
+			<button id="new-note" title="Şablondan yeni not">＋</button>
+		</div>
+		<div id="note-list"></div>
+	</aside>
+	<nav id="toc">
+		<div class="pane-head"><span class="eyebrow">İçindekiler</span><span id="toc-stats"></span></div>
+		<ol id="toc-list"></ol>
+	</nav>
+	<main id="reader">
+		<header id="reader-head">
+			<div>
+				<div class="eyebrow" id="note-collection"></div>
+				<h1 id="note-title" dir="auto"></h1>
+				<div id="note-meta"></div>
+			</div>
+			<div class="actions">
+				<button id="edit">Zotero'da düzenle</button>
+			</div>
+		</header>
+		<article id="content"></article>
+		<div id="empty">Soldan bir not seçin.</div>
+	</main>
+</body>
+</html>

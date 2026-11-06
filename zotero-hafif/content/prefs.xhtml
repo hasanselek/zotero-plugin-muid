@@ -1,0 +1,257 @@
+<vbox id="hafif-prefs" class="main-section" xmlns:html="http://www.w3.org/1999/xhtml">
+	<html:style>
+		#hafif-prefs { --hf-line: color-mix(in srgb, currentColor 14%, transparent); --hf-soft: color-mix(in srgb, currentColor 5%, transparent); --hf-accent: #8a5a2b; }
+		@media (prefers-color-scheme: dark) { #hafif-prefs { --hf-accent: #d9a466; } }
+		#hafif-prefs html|*, #hafif-prefs html|*::before { box-sizing: border-box; }
+		#hafif-prefs .hf-intro { margin: 0 0 10px; opacity: .8; line-height: 1.45; }
+		#hafif-prefs .hf-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+		#hafif-prefs .hf-nav html|a { padding: 3px 10px; border: 1px solid var(--hf-line); border-radius: 12px; font-size: 12px; cursor: pointer; color: inherit; text-decoration: none; }
+		#hafif-prefs .hf-nav html|a:hover { border-color: var(--hf-accent); color: var(--hf-accent); }
+		#hafif-prefs .hf-card { border: 1px solid var(--hf-line); border-radius: 10px; padding: 12px 14px 14px; margin: 0 0 14px; }
+		#hafif-prefs .hf-card > html|h2 { font-size: 14px; margin: 0 0 2px; display: flex; gap: 8px; align-items: center; }
+		#hafif-prefs .hf-lead { font-size: 12px; opacity: .72; margin: 0 0 10px; line-height: 1.45; }
+		#hafif-prefs .hf-row { display: flex; gap: 8px; align-items: center; margin: 6px 0; flex-wrap: wrap; }
+		#hafif-prefs .hf-row > html|label:first-child:not(.hf-check) { min-width: 170px; }
+		#hafif-prefs .hf-check { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; cursor: pointer; }
+		#hafif-prefs .hf-check html|input { margin-top: 2px; }
+		#hafif-prefs .hf-help { font-size: 11.5px; opacity: .65; margin: 2px 0 8px; line-height: 1.4; }
+		#hafif-prefs .hf-err { color: #c0392b; font-size: 12px; }
+		#hafif-prefs .hf-ok { color: #2e7d32; font-size: 11.5px; transition: opacity .6s; }
+		#hafif-prefs html|textarea { width: 100%; min-height: 80px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+		#hafif-prefs html|input[type="text"], #hafif-prefs html|input:not([type]), #hafif-prefs html|input[type="password"], #hafif-prefs html|input[type="search"] { padding: 3px 6px; }
+		#hafif-prefs html|button { cursor: pointer; }
+		#hafif-prefs .hf-sub { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; opacity: .6; font-weight: 600; margin: 12px 0 4px; }
+
+		/* Eylem tablosu */
+		#hafif-prefs .hf-act { display: grid; grid-template-columns: 1fr auto auto; gap: 4px 10px; align-items: center; padding: 6px 4px; border-top: 1px solid var(--hf-line); }
+		#hafif-prefs .hf-act:hover { background: var(--hf-soft); }
+		#hafif-prefs .hf-act .n { font-weight: 600; }
+		#hafif-prefs .hf-act .d { font-size: 11.5px; opacity: .65; line-height: 1.35; }
+		#hafif-prefs .hf-key { min-width: 112px; padding: 3px 8px; border: 1px solid var(--hf-line); border-radius: 6px; background: transparent; color: inherit; font: inherit; font-variant-numeric: tabular-nums; text-align: center; }
+		#hafif-prefs .hf-key.empty { opacity: .5; }
+		#hafif-prefs .hf-key.rec { border-color: var(--hf-accent); color: var(--hf-accent); }
+		#hafif-prefs .hf-key.clash { border-color: #c0392b; }
+		#hafif-prefs .hf-menu { font-size: 11.5px; display: flex; gap: 4px; align-items: center; white-space: nowrap; }
+		#hafif-prefs .hf-x { border: 0; background: none; color: inherit; opacity: .5; font-size: 14px; padding: 0 4px; }
+		#hafif-prefs .hf-x:hover { opacity: 1; color: #c0392b; }
+
+		/* Kurallar ve betikler */
+		#hafif-prefs .hf-rule { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--hf-line); }
+		#hafif-prefs .hf-rule .w { font-size: 11.5px; opacity: .65; }
+		#hafif-prefs .hf-script { border: 1px solid var(--hf-line); border-radius: 8px; padding: 8px 10px; margin: 8px 0; }
+		#hafif-prefs .hf-script .head { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+		#hafif-prefs .hf-script .head html|input.name { flex: 1; min-width: 160px; font-weight: 600; }
+		#hafif-prefs .hf-empty { font-size: 12px; opacity: .6; font-style: italic; padding: 6px 0; }
+		#hafif-prefs .hf-tags { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; max-width: 420px; }
+		#hafif-prefs .hf-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 14px; }
+	</html:style>
+
+	<html:p class="hf-intro">Hafif'in bütün ayarları burada. Değişiklikler hemen kaydedilir; Zotero'yu yeniden başlatmak gerekmez.</html:p>
+	<html:div class="hf-nav" id="hafif-nav"></html:div>
+
+	<!-- Eylemler ve kısayollar -->
+	<html:section class="hf-card" id="hf-sec-actions" data-title="Eylemler ve kısayollar">
+		<html:h2>⌨︎ Eylemler ve kısayollar</html:h2>
+		<html:p class="hf-lead">Tam ekran, panelleri kapatma, okuma etiketleri, toplu düzenleme… Kısayol vermek için düğmeye tıklayıp tuşlara basın (silmek için ⌫, vazgeçmek için esc). “Menüde” işaretliler, kayda sağ tıklayınca “Hafif eylemleri” altında çıkar. Kısayol vermediğiniz eylemlere de <html:b id="hafif-palette-key">⌘⇧K</html:b> eylem paletinden ulaşabilirsiniz.</html:p>
+		<html:div class="hf-row">
+			<html:input id="hafif-act-filter" type="search" placeholder="Eylem ara…" style="flex: 1"/>
+			<html:button id="hafif-act-reset">Varsayılan kısayollar</html:button>
+		</html:div>
+		<html:div id="hafif-actions"></html:div>
+	</html:section>
+
+	<!-- Otomatik kurallar -->
+	<html:section class="hf-card" id="hf-sec-rules" data-title="Otomatik kurallar">
+		<html:h2>⚡︎ Otomatik kurallar</html:h2>
+		<html:p class="hf-lead">Bir şey olduğunda kendiliğinden yapılacak işler. Örnek: yeni eklenen her kayda “/okunacak” etiketi; PDF'i açınca “okunuyor”. Eşitleme ile gelen kayıtlar “yeni” sayılmaz.</html:p>
+		<html:div id="hafif-rules"></html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-rule-add">＋ Kural ekle</html:button>
+			<html:button id="hafif-rule-presets">Okuma akışı kurallarını ekle</html:button>
+		</html:div>
+	</html:section>
+
+	<!-- Okuma etiketleri -->
+	<html:section class="hf-card" id="hf-sec-read" data-title="Okuma etiketleri">
+		<html:h2>🏷︎ Okuma etiketleri</html:h2>
+		<html:p class="hf-lead">“Okunacak / Okunuyor / Okundu olarak işaretle” eylemlerinin kullandığı etiketler. Biri eklenince diğer ikisi kaldırılır. Başına “/” koymak etiketleri listede ayrı ve üstte tutar.</html:p>
+		<html:div class="hf-tags">
+			<html:label for="hafif-tag-toRead">Okunacak</html:label><html:input id="hafif-tag-toRead"/>
+			<html:label for="hafif-tag-reading">Okunuyor</html:label><html:input id="hafif-tag-reading"/>
+			<html:label for="hafif-tag-read">Okundu</html:label><html:input id="hafif-tag-read"/>
+		</html:div>
+	</html:section>
+
+	<!-- MCP -->
+	<html:section class="hf-card" id="hf-sec-mcp" data-title="MCP sunucusu">
+		<html:h2>⇄ MCP sunucusu</html:h2>
+		<html:p class="hf-lead">Claude Desktop, Claude Code ve diğer MCP istemcilerinin kütüphanenizi okuyabilmesi için. Zotero açıkken çalışır, yalnızca bu bilgisayardan erişilir ve her istek aşağıdaki erişim anahtarını taşımalıdır. Araçlar: arama (anlamsal dahil), künye, PDF okuma, notlar, vurgular, koleksiyonlar.</html:p>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-mcpEnabled"/><html:span>MCP sunucusunu aç</html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-mcpWrite"/><html:span>Yeni not oluşturmaya izin ver <html:span class="hf-help">(yalnızca ekler; var olan hiçbir şeyi değiştirmez ya da silmez)</html:span></html:span></html:label>
+		<html:div class="hf-row">
+			<html:label>Adres</html:label>
+			<html:code id="hafif-mcpUrl"></html:code>
+		</html:div>
+		<html:div class="hf-row">
+			<html:label>Erişim anahtarı</html:label>
+			<html:input id="hafif-mcpToken" readonly="true" style="flex: 1; font-family: ui-monospace, Menlo, monospace"/>
+			<html:button id="hafif-mcpRenew">Yenile</html:button>
+		</html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-mcpCode">Claude Code komutunu kopyala</html:button>
+			<html:button id="hafif-mcpDesktop">Claude Desktop yapılandırmasını kopyala</html:button>
+			<html:button id="hafif-mcpTest">Dene</html:button>
+			<html:span id="hafif-mcpMsg" class="hf-ok"></html:span>
+		</html:div>
+		<html:div class="hf-help">Claude Desktop için: Ayarlar › Geliştirici › Yapılandırmayı düzenle; kopyaladığınız “zotero” girdisini mcpServers içine ekleyin (Node.js gerekir). Claude Code için kopyaladığınız komutu terminalde bir kez çalıştırın.</html:div>
+	</html:section>
+
+	<!-- Notlar -->
+	<html:section class="hf-card" id="hf-sec-notes" data-title="Notlar">
+		<html:h2>✎ Notlar</html:h2>
+		<html:p class="hf-lead">Okurken vurguları ve seçili metni konu notlarınızın başlıklarına göndermek için.</html:p>
+		<html:div class="hf-row">
+			<html:label>Not koleksiyonları</html:label>
+			<html:b id="hafif-collections"></html:b>
+		</html:div>
+		<html:div class="hf-help">Değiştirmek için kütüphanede bir koleksiyona sağ tıklayıp “Not hedefi olarak kullan” deyin.</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-autoAppend"/><html:span>Okuyucuda yeni vurguları son gönderdiğim başlığa kendiliğinden ekle</html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-noteOutline"/><html:span>Not düzenleyicide yüzen içindekiler kutusunu göster <html:span class="hf-help">(başlıkları sürükleyerek bölümleri taşıma)</html:span></html:span></html:label>
+
+		<html:div class="hf-sub">Alıntı biçimi</html:div>
+		<html:textarea id="hafif-quoteTemplate"></html:textarea>
+		<html:div class="hf-help">Kullanılabilenler: {{highlight}} vurgulanan metin, {{citation}} atıf, {{comment}} yorumunuz, {{tags}}, {{color}}. Koşul: {{if comment}}…{{endif}}. <html:a id="hafif-quote-reset" href="#">Varsayılana dön</html:a></html:div>
+
+		<html:div class="hf-sub">Not şablonları</html:div>
+		<html:div class="hf-help">Araçlar › Şablondan yeni not ile kullanılır. {{başlık}} ve {{tarih}} doldurulur.</html:div>
+		<html:div id="hafif-templates"></html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-tpl-add">＋ Şablon ekle</html:button>
+			<html:span id="hafif-templates-err" class="hf-err"></html:span>
+		</html:div>
+	</html:section>
+
+	<!-- Özel betikler -->
+	<html:section class="hf-card" id="hf-sec-scripts" data-title="Özel betikler">
+		<html:h2>{ } Özel betikler</html:h2>
+		<html:p class="hf-lead">Kendi küçük JavaScript eylemleriniz. Yukarıdaki eylem listesinde görünürler; kısayol verilebilir, kurallara bağlanabilir. Kullanılabilenler: <html:code>items</html:code> (seçili kayıtlar), <html:code>item</html:code>, <html:code>collection</html:code>, <html:code>reader</html:code>, <html:code>window</html:code>, <html:code>Zotero</html:code>, <html:code>Hafif</html:code>. Metin döndürürseniz ekranda gösterilir.</html:p>
+		<html:div id="hafif-scripts"></html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-script-add">＋ Betik ekle</html:button>
+			<html:button id="hafif-script-example">Örnek ekle</html:button>
+		</html:div>
+	</html:section>
+
+	<!-- Hızlı pencereler -->
+	<html:section class="hf-card" id="hf-sec-quick" data-title="Hızlı pencereler">
+		<html:h2>⌕ Hızlı pencereler</html:h2>
+		<html:div class="hf-row">
+			<html:label for="hafif-searchKey">Hızlı arama</html:label>
+			<html:span>⌘⇧</html:span><html:input id="hafif-searchKey" maxlength="1" size="2" style="width: 3em; text-align: center"/>
+		</html:div>
+		<html:div class="hf-help">Etiket gezgini ⌘⇧T, sekme yöneticisi ⌘⇧E ile açılır.</html:div>
+	</html:section>
+
+	<!-- Görünüm -->
+	<html:section class="hf-card" id="hf-sec-view" data-title="Görünüm">
+		<html:h2>◐ Görünüm</html:h2>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-leftFloat"/><html:span>Yüzer kitaplık <html:span class="hf-help">— Zotero'nun koleksiyon paneli kapanır, kayıt listesi bütün genişliği alır. Sekme çubuğunun en solundaki düğme (ya da ⌘⌥←) her sekmede — PDF, EPUB okurken ya da not yazarken — koleksiyonlarınızı ve eserlerinizi gösteren küçük bir çerçeve açar. Esere tıklayınca açılır, boşluk Hızlı Bakış, ⌥ tıklama kütüphanede gösterir; üstteki kutu bütün kütüphanede arar.</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-quickLook"/><html:span>Boşluk tuşuyla Hızlı Bakış <html:span class="hf-help">— listede bir kayıt seçiliyken boşluk, ekinin bütün sayfalarını önizler (macOS'taki gibi). ↑↓ ile kayıtlar arasında gezinilir; boşluk ya da esc kapatır.</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-notePreview"/><html:span>Notlarda sayfa önizlemesi <html:span class="hf-help">— PDF'ten gelen vurgunun ya da atfın üzerinde fare iki saniye durunca kaynağın o sayfası gösterilir.</html:span></html:span></html:label>
+	</html:section>
+
+	<!-- Sağ panel -->
+	<html:section class="hf-card" id="hf-sec-panel" data-title="Sade bilgi paneli">
+		<html:h2>▤ Sade bilgi paneli</html:h2>
+		<html:p class="hf-lead">Sağ paneldeki kullanmadığınız bölümleri gizleyin (kütüphanede ve okuyucuda).</html:p>
+		<html:div class="hf-grid2" id="hafif-panel-sections"></html:div>
+	</html:section>
+
+	<!-- Atıf -->
+	<html:section class="hf-card" id="hf-sec-cite" data-title="Atıf">
+		<html:h2>❝ Atıf</html:h2>
+		<html:div class="hf-row">
+			<html:label for="hafif-citeStyle">Atıf stili</html:label>
+			<html:select id="hafif-citeStyle" style="flex: 1; max-width: 380px"></html:select>
+		</html:div>
+		<html:div class="hf-help">Sağ paneldeki atıf önizlemesi ve “Kaynakça/Atıf olarak kopyala” eylemleri bu stili kullanır.</html:div>
+	</html:section>
+
+	<!-- PDF taşıma -->
+	<html:section class="hf-card" id="hf-sec-move" data-title="PDF taşıma">
+		<html:h2>⇢ PDF taşıma</html:h2>
+		<html:div class="hf-row">
+			<html:label for="hafif-moveDir">Hedef klasör</html:label>
+			<html:input id="hafif-moveDir" style="flex: 1"/>
+			<html:button id="hafif-moveDir-pick">Seç…</html:button>
+		</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-moveByCollection"/><html:span>Koleksiyon adıyla alt klasörlere ayır</html:span></html:label>
+	</html:section>
+
+	<!-- Yapay zekâ -->
+	<html:section class="hf-card" id="hf-sec-ai" data-title="Yapay zekâ asistanı">
+		<html:h2>✦ Yapay zekâ asistanı</html:h2>
+		<html:p class="hf-lead">⌘J ile açılan sohbet paneli kütüphanenizde arar, PDF'leri okur, vurgu ve notlarınıza bakar ve cevapları sayfa atıflarıyla verir. Aşağıdan bir ya da birkaç sağlayıcı ekleyin; model listeleri sağlayıcıdan canlı çekilir, yeni çıkan modeller kendiliğinden görünür. Anahtarlar yalnızca bu bilgisayarda saklanır ve yalnızca ilgili sağlayıcıya gönderilir.</html:p>
+
+		<html:div class="hf-row">
+			<html:label for="hafif-aiDefault">Varsayılan model</html:label>
+			<html:select id="hafif-aiDefault" style="flex: 1; max-width: 380px"></html:select>
+		</html:div>
+		<html:div class="hf-row">
+			<html:label for="hafif-aiEffort">Düşünme çabası</html:label>
+			<html:select id="hafif-aiEffort">
+				<html:option value="low">düşük (hızlı, ucuz)</html:option>
+				<html:option value="medium">orta (önerilen)</html:option>
+				<html:option value="high">yüksek</html:option>
+				<html:option value="xhigh">çok yüksek</html:option>
+				<html:option value="max">en yüksek</html:option>
+			</html:select>
+		</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-aiWebSearch"/><html:span>Gerektiğinde web'de de arasın ve sayfa okusun <html:span class="hf-help">(Claude ve Gemini kendi web aramasını kullanır; bütün modeller verilen bir adresi okuyabilir. Kütüphane her zaman önce gelir.)</html:span></html:span></html:label>
+
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-aiAutoApprove"/><html:span>Değişiklikleri sormadan uygula <html:span class="hf-help">(PDF'e vurgu ekleme gibi işlemler normalde önce gösterilir ve onayınızı bekler; her eklemenin altında “geri al” düğmesi vardır)</html:span></html:span></html:label>
+
+		<html:div class="hf-sub">Sağlayıcılar</html:div>
+		<html:div id="hafif-providers"></html:div>
+
+		<html:div class="hf-sub">Kendi uç noktalarınız</html:div>
+		<html:div class="hf-help">OpenAI ya da Anthropic biçiminde konuşan her sunucu: üniversite sunucusu, vLLM, LiteLLM, Together, Fireworks, Azure… Adres “/v1” ile biter.</html:div>
+		<html:div id="hafif-custom"></html:div>
+		<html:div class="hf-row"><html:button id="hafif-custom-add">＋ Uç nokta ekle</html:button></html:div>
+
+		<html:div class="hf-sub">Anlamsal arama dizini</html:div>
+		<html:div class="hf-help">Asistanın kelimesi geçmese de anlamca ilgili kaynakları (başka dildeki karşılıklarıyla) bulabilmesi için kütüphanenizin bir “anlam dizini” bu bilgisayarda kurulur. Metinler yalnızca bir kez, seçtiğiniz sağlayıcıya gömülmek için gider; arama tamamen yerelde yapılır. Türkçe/Arapça için çok dilli bir model seçin: Ollama'da <html:b>bge-m3</html:b> (ücretsiz, yerel), Gemini, OpenAI ya da Voyage.</html:div>
+		<html:div class="hf-row">
+			<html:label for="hafif-embedProvider">Gömme sağlayıcısı</html:label>
+			<html:select id="hafif-embedProvider"></html:select>
+			<html:input id="hafif-embedModel" placeholder="model" style="flex: 1; max-width: 240px"/>
+		</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-embedFulltext"/><html:span>PDF ve EPUB tam metinlerini de dizinle <html:span class="hf-help">(sayfa düzeyinde bulur; büyük kütüphanede ilk kurulum uzun sürer ve ücretli sağlayıcıda maliyeti olur — Ollama'da ücretsiz)</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-embedAuto"/><html:span>Kütüphane değişince dizini kendiliğinden güncelle</html:span></html:label>
+		<html:div class="hf-row">
+			<html:button id="hafif-embedBuild">Dizini oluştur / güncelle</html:button>
+			<html:button id="hafif-embedStop" hidden="true">Durdur</html:button>
+			<html:button id="hafif-embedDelete">Dizini sil</html:button>
+		</html:div>
+		<html:div id="hafif-embedStatus" class="hf-help"></html:div>
+
+		<html:div class="hf-sub">Dış literatür</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-aiExternal"/><html:span>Gerektiğinde kütüphane dışındaki literatürde ara <html:span class="hf-help">(OpenAlex: 250 milyonu aşkın akademik eser, atıf ağı ve açık erişim bağlantıları; ücretsiz, anahtar gerekmez. Yalnızca arama sözcükleri gönderilir.)</html:span></html:span></html:label>
+
+		<html:div class="hf-sub">Kalıcı talimatlar</html:div>
+		<html:textarea id="hafif-aiInstructions" placeholder="Ör. Atıfları İSNAD 2. edisyona göre ver. Arapça alıntıların Türkçe çevirisini de ekle. Hicrî tarihleri miladî karşılıklarıyla yaz." style="font-family: inherit; min-height: 70px"></html:textarea>
+		<html:div class="hf-help">Her sohbette asistana verilir.</html:div>
+	</html:section>
+
+	<!-- Gelişmiş -->
+	<html:section class="hf-card" id="hf-sec-adv" data-title="Gelişmiş">
+		<html:h2>⚙︎ Gelişmiş</html:h2>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-selfTest"/><html:span>Açılışta kendi kendini sına <html:span class="hf-help">(sonuçlar Yardım › Hata ayıklama çıktısında “[Hafif TEST]”)</html:span></html:span></html:label>
+		<html:div class="hf-row">
+			<html:button id="hafif-export">Ayarları dışa aktar</html:button>
+			<html:button id="hafif-import">İçe aktar…</html:button>
+			<html:span id="hafif-io-msg" class="hf-ok"></html:span>
+		</html:div>
+		<html:div class="hf-help">Dışa aktarma bütün Hafif ayarlarını (API anahtarı hariç) panoya JSON olarak kopyalar; başka bilgisayara taşımak ya da yedeklemek için.</html:div>
+	</html:section>
+</vbox>

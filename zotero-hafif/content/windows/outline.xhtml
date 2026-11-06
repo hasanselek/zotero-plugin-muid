@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="tr" windowtype="hafif:outline">
+<head>
+	<meta charset="utf-8"/>
+	<title>PDF İçindekiler</title>
+	<link rel="stylesheet" href="chrome://hafif/content/windows/outline.css"/>
+	<script src="chrome://zotero/content/include.js"></script>
+	<script src="chrome://hafif/content/windows/outline.js"></script>
+</head>
+<body>
+	<header>
+		<div class="eyebrow">PDF içindekiler</div>
+		<h1 id="title" dir="auto"></h1>
+		<div id="meta"></div>
+	</header>
+	<section class="tools">
+		<span>Vurgulardan ekle:</span>
+		<select id="color"></select>
+		<select id="color-level">
+			<option value="1">1. düzey</option>
+			<option value="2">2. düzey</option>
+			<option value="3">3. düzey</option>
+		</select>
+		<button id="add-colored">Ekle</button>
+		<span class="grow"></span>
+		<button id="add-blank">＋ Boş başlık</button>
+	</section>
+	<ol id="list"></ol>
+	<div id="empty" class="hidden">Henüz başlık yok. Okurken metni seçip “İçindekilere ekle” deyin ya da vurgulardan ekleyin.</div>
+	<footer>
+		<span id="status"></span>
+		<span class="grow"></span>
+		<button id="cancel">Kapat</button>
+		<button id="save" class="primary">PDF'e kaydet</button>
+	</footer>
+</body>
+</html>

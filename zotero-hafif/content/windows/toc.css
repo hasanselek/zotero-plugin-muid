@@ -1,0 +1,107 @@
+:root {
+	--bg: #f7f5f0;
+	--panel: #efece5;
+	--card: #fffdf8;
+	--ink: #23211c;
+	--muted: #7a756a;
+	--line: #e0dbd0;
+	--accent: #8a5a2b;
+	--accent-soft: #f1e4d3;
+	--quote: #fbf6ec;
+	--sel: #e9dcc8;
+	color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #1d1c1a;
+		--panel: #242320;
+		--card: #23221f;
+		--ink: #ece8df;
+		--muted: #9b958a;
+		--line: #3a3833;
+		--accent: #d9a466;
+		--accent-soft: #3a2f22;
+		--quote: #2a2723;
+		--sel: #3b342b;
+	}
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+	display: grid;
+	grid-template-columns: 270px 300px 1fr;
+	background: var(--bg);
+	color: var(--ink);
+	font: 13px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif;
+}
+button {
+	font: inherit; color: inherit; cursor: pointer;
+	background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px;
+}
+button:hover { border-color: var(--accent); }
+.eyebrow { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* Sol: not listesi */
+#notes { background: var(--panel); border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.pane-head { display: flex; gap: 6px; align-items: center; padding: 12px; border-bottom: 1px solid var(--line); min-height: 50px; }
+#filter { flex: 1; padding: 6px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: inherit; font: inherit; }
+#new-note { padding: 4px 9px; font-size: 15px; line-height: 1; }
+#note-list { overflow-y: auto; padding: 6px 0 16px; }
+.group { padding: 14px 14px 4px; }
+.note-row { padding: 7px 14px 7px 12px; border-left: 3px solid transparent; cursor: default; }
+.note-row:hover { background: color-mix(in srgb, var(--sel) 50%, transparent); }
+.note-row.active { background: var(--sel); border-left-color: var(--accent); }
+.note-row .t { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-row .m { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+
+/* Orta: içindekiler */
+#toc { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
+#toc .pane-head { justify-content: space-between; }
+#toc-stats { font-size: 11.5px; color: var(--muted); }
+#toc-list { list-style: none; margin: 0; padding: 8px 0 24px; overflow-y: auto; counter-reset: none; }
+#toc-list li { display: flex; gap: 8px; align-items: baseline; padding: 5px 14px; cursor: default; border-left: 3px solid transparent; }
+#toc-list li:hover { background: color-mix(in srgb, var(--sel) 50%, transparent); }
+#toc-list li.active { border-left-color: var(--accent); background: var(--accent-soft); }
+#toc-list .num { color: var(--accent); font-variant-numeric: tabular-nums; font-size: 11.5px; min-width: 2.2em; font-weight: 600; }
+#toc-list .txt { flex: 1; min-width: 0; }
+#toc-list .cnt { font-size: 10.5px; color: var(--muted); background: var(--panel); border-radius: 9px; padding: 0 6px; }
+#toc-list li.l1 .txt { font-weight: 650; }
+#toc-list li.l2 { padding-left: 26px; }
+#toc-list li.l3 { padding-left: 40px; font-size: 12.5px; color: color-mix(in srgb, var(--ink) 80%, var(--muted)); }
+#toc-list .none { padding: 14px; color: var(--muted); font-style: italic; }
+
+/* Sağ: okuma görünümü */
+#reader { overflow-y: auto; min-height: 0; position: relative; scroll-behavior: smooth; }
+#reader-head {
+	position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+	padding: 22px 48px 14px; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px);
+	border-bottom: 1px solid var(--line);
+}
+#note-title { margin: 4px 0 4px; font: 600 22px/1.25 "Iowan Old Style", Charter, Georgia, "Geeza Pro", serif; }
+#note-meta { color: var(--muted); font-size: 12px; }
+#content {
+	max-width: 760px; margin: 0 auto; padding: 28px 48px 120px;
+	font: 16px/1.7 "Iowan Old Style", Charter, Georgia, "Geeza Pro", "Times New Roman", serif;
+}
+#content h1, #content h2, #content h3 { font-family: inherit; line-height: 1.3; scroll-margin-top: 110px; }
+#content h1 { font-size: 1.55em; margin: 1.6em 0 .5em; padding-bottom: .25em; border-bottom: 1px solid var(--line); }
+#content h2 { font-size: 1.25em; margin: 1.5em 0 .4em; }
+#content h3 { font-size: 1.07em; margin: 1.3em 0 .3em; color: var(--accent); }
+#content .flash { animation: flash 1.6s ease-out; }
+@keyframes flash { 0%, 30% { background: var(--accent-soft); } 100% { background: transparent; } }
+#content blockquote {
+	margin: 1em 0; padding: .6em 1em .6em 1.1em; background: var(--quote);
+	border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+}
+#content blockquote[dir="rtl"], #content blockquote:dir(rtl) { border-left: 0; border-right: 3px solid var(--accent); border-radius: 8px 0 0 8px; }
+#content blockquote p { margin: .2em 0; }
+#content .highlight, #content .underline { cursor: pointer; border-radius: 3px; transition: background .15s; }
+#content .highlight:hover, #content .underline:hover { background: var(--accent-soft); }
+#content .citation { font-size: .86em; color: var(--muted); white-space: nowrap; cursor: pointer; }
+#content .citation:hover { color: var(--accent); }
+#content img { max-width: 100%; height: auto; border-radius: 6px; }
+#content table { border-collapse: collapse; }
+#content td, #content th { border: 1px solid var(--line); padding: 4px 8px; }
+#empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
+.hidden { display: none !important; }
