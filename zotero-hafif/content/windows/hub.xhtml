@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="tr" windowtype="hafif:hub">
+<head>
+	<meta charset="utf-8"/>
+	<title>Hafif Merkezi</title>
+	<link rel="stylesheet" href="chrome://hafif/content/windows/hub.css"/>
+	<script src="chrome://zotero/content/include.js"></script>
+	<script src="chrome://hafif/content/windows/hub.js"></script>
+</head>
+<body>
+	<header id="top">
+		<nav id="tabs"></nav>
+		<select id="library" title="Kütüphane"></select>
+	</header>
+
+	<!-- Vurgular -->
+	<section class="pane" id="pane-annots">
+		<div class="bar">
+			<input id="a-q" type="search" dir="auto" placeholder="Vurgu ve yorumlarda ara…"/>
+			<span id="a-colors" class="chips"></span>
+			<select id="a-type">
+				<option value="">Bütün türler</option>
+				<option value="highlight">Vurgu</option>
+				<option value="underline">Altı çizili</option>
+				<option value="note">Not</option>
+				<option value="image">Alan</option>
+				<option value="text">Metin</option>
+			</select>
+			<select id="a-since">
+				<option value="">Her zaman</option>
+				<option value="7">Son 7 gün</option>
+				<option value="30">Son 30 gün</option>
+				<option value="365">Son bir yıl</option>
+			</select>
+			<select id="a-col"></select>
+		</div>
+		<div class="list" id="a-list"></div>
+		<footer class="foot">
+			<span id="a-count" class="muted"></span>
+			<span class="grow"></span>
+			<button id="a-all">Hepsini seç</button>
+			<button id="a-copy">Markdown kopyala</button>
+			<button id="a-save">Markdown kaydet…</button>
+			<button id="a-send" class="primary">Seçilenleri nota gönder…</button>
+		</footer>
+	</section>
+
+	<!-- Tekrar -->
+	<section class="pane" id="pane-review">
+		<div class="review-wrap">
+			<div id="r-progress" class="muted"></div>
+			<article id="r-card" class="card big"></article>
+			<div class="r-buttons">
+				<button id="r-no" title="2">↺ Yarın yine göster</button>
+				<button id="r-open" title="3">Kaynağında aç</button>
+				<button id="r-skip" title="0">Bir daha gösterme</button>
+				<button id="r-yes" class="primary" title="1">✓ Hatırladım</button>
+			</div>
+			<div class="muted small">Klavye: 1 hatırladım · 2 yarın yine · 3 kaynağında aç · 0 bir daha gösterme</div>
+		</div>
+	</section>
+
+	<!-- Okuma -->
+	<section class="pane" id="pane-reading">
+		<div class="stats" id="g-stats"></div>
+		<div class="chart" id="g-chart"></div>
+		<div class="list" id="g-list"></div>
+	</section>
+
+	<!-- Projeler -->
+	<section class="pane" id="pane-projects">
+		<div class="bar">
+			<span class="muted">Her proje: kaynak koleksiyonu + bölümlü taslak notu + atıf stili. Okurken vurgular etkin projenin taslağına gider.</span>
+			<span class="grow"></span>
+			<button id="p-new" class="primary">＋ Yeni yazım projesi</button>
+		</div>
+		<div class="list" id="p-list"></div>
+	</section>
+
+	<!-- Künye denetimi -->
+	<section class="pane" id="pane-lint">
+		<div class="bar">
+			<select id="l-scope"></select>
+			<button id="l-run" class="primary">Denetle</button>
+			<label class="chk"><input type="checkbox" id="l-info" checked="checked"/> Bilgi düzeyindekileri de göster</label>
+			<span class="grow"></span>
+			<button id="l-fix" disabled="disabled">Düzeltilebilenlerin hepsini düzelt</button>
+		</div>
+		<div class="list" id="l-list"><div class="empty">Kaynakları İSNAD'a göre denetlemek için kapsamı seçip “Denetle”ye basın.</div></div>
+		<footer class="foot"><span id="l-count" class="muted"></span></footer>
+	</section>
+</body>
+</html>

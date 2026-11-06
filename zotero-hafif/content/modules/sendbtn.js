@@ -33,7 +33,7 @@ Hafif.modules.sendbtn = {
 			for (let end of doc.querySelectorAll(".annotation-popup .preview header .end")) {
 				if (end.querySelector(".hafif-send")) continue;
 				let btn = this._button(doc, reader, () => {
-					let st = reader._internalReader?._state;
+					let st = Hafif.load("compat").readerState(reader);
 					let id = st?.primaryViewAnnotationPopup?.annotation?.id || st?.secondaryViewAnnotationPopup?.annotation?.id;
 					return id ? [id] : [];
 				});
@@ -51,14 +51,14 @@ Hafif.modules.sendbtn = {
 	},
 
 	watchAll() {
-		for (let r of Zotero.Reader._readers || []) {
+		for (let r of Hafif.load("compat").readers()) {
 			if (r._iframeWindow) this.watch(r);
 		}
 	},
 
 	/** Sol panelde birden çok vurgu seçiliyken simgesine basılan seçiliyse hepsi gider. */
 	_keysFor(reader, key) {
-		let sel = [...(reader._internalReader?._state?.selectedAnnotationIDs || [])];
+		let sel = Hafif.load("compat").selectedAnnotationIDs(reader);
 		return sel.length > 1 && sel.includes(key) ? sel : [key];
 	},
 
@@ -127,7 +127,7 @@ Hafif.modules.sendbtn = {
 	shutdown() {
 		for (let o of this._observers) o.disconnect();
 		this._observers.clear();
-		for (let r of Zotero.Reader._readers || []) {
+		for (let r of Hafif.load("compat").readers()) {
 			let doc = r._iframeWindow?.document;
 			if (!doc) continue;
 			for (let el of doc.querySelectorAll(".hafif-send, .hafif-send-style")) el.remove();

@@ -1,0 +1,6 @@
+# Paketler GitHub Releases'te durur, depoda değil
+zotero-hafif/dist/
+*.xpi
+node_modules/
+.DS_Store
+*.log

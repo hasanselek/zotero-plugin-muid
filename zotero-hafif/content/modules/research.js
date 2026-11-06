@@ -8,7 +8,7 @@ Hafif.modules.research = {
 
 	tools() {
 		let R = this;
-		let T = Hafif.load("libtools");
+		Hafif.load("libtools");
 		let list = [
 			{
 				name: "semantic_search",

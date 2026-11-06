@@ -6,8 +6,9 @@
 Hafif.modules.actions = {
 	GROUPS: [
 		["ai", "Yapay zekâ"],
+		["write", "Yazma"],
 		["view", "Görünüm"],
-		["read", "Okuma etiketleri"],
+		["read", "Okuma"],
 		["edit", "Toplu düzenleme"],
 		["copy", "Kopyala ve bağlantı"],
 		["org", "Düzen"],
@@ -36,7 +37,24 @@ Hafif.modules.actions = {
 			{ id: "aiOCR", group: "ai", items: true, name: "Taranmış PDF'i metne çevir (OCR)", desc: "Metin katmanı olmayan sayfaları görsel destekli modelle okur ve saklar; sonra aranabilir ve asistan tarafından okunabilir.", run: (c) => Hafif.load("tables").ocrAction(c.win, c.items) },
 			{ id: "litSearch", group: "ai", name: "Literatür ara…", desc: "YÖK Tez, DergiPark, TDV İslâm Ansiklopedisi ve OpenAlex'te tez türü, alan, yıl ve dil süzgeçleriyle (ya da doğal dilde) arar; sonuçları künyesi ve PDF'iyle ekler.", run: () => Hafif.load("sources").open() },
 			{ id: "aiMeta", group: "ai", items: true, name: "Künyeyi PDF'ten çıkar (YZ)", desc: "Seçili PDF'lerin ilk sayfalarından ve künye sayfasından künyeyi çıkarır; üst kaydı olmayan PDF'e kayıt oluşturur, olanı düzeltir (onaylı).", run: (c) => A.aiMeta(c) },
+			{ id: "aiVerify", group: "ai", items: true, name: "Nottaki alıntıları kaynağında doğrula", desc: "Seçili notta atıfla biten tırnaklı alıntıları kaynağın PDF'inde arar: metin var mı, gösterilen sayfada mı?", run: ({ win, items }) => Hafif.load("verify").verifyNote(win, items.find(i => i.isNote())) },
+			{ id: "aiRelated", group: "ai", items: true, name: "İlgili kaynaklar ve notlar (anlamca)", desc: "Seçili notun ya da kaydın içeriğine anlamca yakın kayıtları, notları ve PDF bölümlerini anlamsal dizinden bulur.", run: (c) => A.related(c) },
+			{ id: "aiMatrix", group: "ai", name: "Literatür tarama matrisi…", desc: "Seçili kayıtları (ya da açık koleksiyonu) araştırma sorusu, yöntem, kaynaklar, bulgular ve katkı/eksik sütunlarında sayfa atıflı bir tabloya döker.", run: (c) => A.aiMatrix(c) },
 			{ id: "aiSummarize", group: "ai", name: "Asistanla özetle", desc: "Açık PDF'i ya da seçili kaydı özetletir.", run: ({ win }) => Hafif.load("chat").show(win, { prompt: "Bunu özetle: ana iddia, yöntem, temel bulgular ve sonuç; her noktaya sayfa atfı ver.", send: true }) },
+
+			// Yazma
+			{ id: "projectNew", group: "write", name: "Yeni yazım projesi…", desc: "Makale, tez, bölüm ya da tebliğ için kaynak koleksiyonu + bölümlü taslak notu + atıf stili kurar; vurgular doğrudan taslağa gider.", run: ({ win }) => Hafif.load("project").create(win) },
+			{ id: "projectSwitch", group: "write", name: "Yazım projesine geç…", desc: "Etkin projeyi seçer; taslağı açar ve vurgu gönderme hedefi yapar.", run: ({ win }) => Hafif.load("project").switch(win) },
+			{ id: "projectAdd", group: "write", items: true, name: "Etkin projeye kaynak olarak ekle", desc: "Seçili kayıtları etkin projenin koleksiyonuna koyar.", run: (c) => Hafif.load("project").addSources(c) },
+			{ id: "projectStatus", group: "write", name: "Proje durumu…", desc: "Sözcük sayısı, bölümler, atıflar; atıf yapılmamış ve koleksiyonda olmayan kaynaklar.", run: ({ win }) => Hafif.load("project").status(win) },
+			{ id: "projectBib", group: "write", name: "Proje kaynakçasını yenile", desc: "Taslaktaki atıflardan, projenin stiliyle “Kaynakça” bölümünü yeniden yazar.", run: ({ win }) => Hafif.load("project").updateBibliography(win) },
+			{ id: "projectExport", group: "write", name: "Proje taslağını dışa aktar (Word / Markdown)…", desc: "Taslağı dipnotlu .docx, Pandoc Markdown ya da zengin metin olarak verir.", run: ({ win }) => Hafif.load("project").exportDraft(win) },
+			{ id: "projectStyle", group: "write", name: "Projenin atıf stilini değiştir…", desc: "Etkin projenin kaynakça ve dışa aktarmada kullandığı CSL stili.", run: ({ win }) => Hafif.load("project").changeStyle(win) },
+			{ id: "exportNote", group: "write", items: true, name: "Notu dışa aktar (Word / Markdown)…", desc: "Seçili notu atıfları biçimlenmiş olarak dışa aktarır (dipnot stillerinde gerçek Word dipnotları).", run: ({ win, items }) => Hafif.load("export").exportNote(win, items.find(i => i.isNote())) },
+			{ id: "citekeyAssign", group: "write", items: true, auto: true, name: "Atıf anahtarı ata (Pandoc/LaTeX)", desc: "Anahtarı olmayan kayıtlara yazarYılKelime biçiminde tekil anahtar yazar (Better BibTeX gerekmez).", run: (c) => Hafif.load("citekey").assign(A._regular(c.items), { quiet: !!c.auto }) },
+			{ id: "citekeyCopy", group: "write", items: true, name: "Atıf anahtarını kopyala (@anahtar)", desc: "Seçili kayıtların Pandoc atıf anahtarlarını panoya kopyalar.", run: (c) => Hafif.load("citekey").copy(A._regular(c.items)) },
+			{ id: "lint", group: "edit", name: "Künye denetimi (İSNAD)…", desc: "Seçili kayıtlarda, açık koleksiyonda ya da bütün kütüphanede eksik alan, büyük harf, ISBN/DOI, tarih, dil ve transkripsiyon sorunlarını bulur.", run: ({ win }) => Hafif.load("lint").run(win) },
+			{ id: "lintFix", group: "edit", items: true, auto: true, name: "Künyeyi güvenle düzelt", desc: "Fazla boşluk, sondaki nokta, DOI öneki, dil adı → kodu, büyük harfli başlık/yazar düzeltmeleri.", run: async (c) => { let n = await Hafif.load("lint").fix(A._regular(c.items)); if (!c.auto) Hafif.toast(n ? `${n} kayıt düzeltildi.` : "Düzeltilecek bir şey yok."); } },
 
 			// Görünüm
 			{ id: "fullscreen", group: "view", name: "Tam ekran", desc: "Zotero penceresini tam ekrana alır ya da çıkarır.", run: ({ win }) => A.fullscreen(win) },
@@ -44,9 +62,14 @@ Hafif.modules.actions = {
 			{ id: "rightPane", group: "view", name: "Sağ paneli aç/kapat", desc: "Kütüphanede kayıt bilgisi paneli; okuyucuda notlar ve bilgi paneli.", run: ({ win }) => A.rightPane(win) },
 			{ id: "focus", group: "view", name: "Odak modu", desc: "Tam ekran ve iki panel kapalı; yalnızca metin. Tekrar basınca eski düzen geri gelir.", run: ({ win }) => A.focusMode(win) },
 			{ id: "leftFloat", group: "view", name: "Yüzer sol panel (aç/kapat)", desc: "Koleksiyon paneli yer kaplamaz; sekme çubuğunun solundaki düğme her sekmede (PDF, EPUB, not) koleksiyonları ve eserleri gösteren küçük bir çerçeve açar.", run: () => Hafif.load("leftfloat").toggleEnabled() },
+			{ id: "sideBySide", group: "view", name: "Yan yana oku…", desc: "İki eseri (ör. Arapça metin ve tercümesi, şerh ve metin) ekranı ikiye bölerek yan yana açar.", run: (c) => A.sideBySide(c) },
 			{ id: "tagSelector", group: "view", name: "Etiket seçiciyi aç/kapat", desc: "Sol alttaki etiket kutusunu gizler ya da gösterir.", run: ({ win }) => win.ZoteroPane.toggleTagSelector() },
 
-			// Okuma etiketleri
+			// Okuma
+			{ id: "hub", group: "read", name: "Hafif Merkezi", desc: "Vurgular, tekrar, okuma istatistikleri, yazım projeleri ve künye denetimi tek pencerede.", run: () => Hafif.load("hub").open() },
+			{ id: "annotations", group: "read", name: "Vurgu panosu", desc: "Bütün kütüphanedeki vurgu ve notlar: renge, türe, metne, tarihe ve koleksiyona göre süzme; nota gönderme, Markdown'a aktarma.", run: () => Hafif.load("hub").open("annots") },
+			{ id: "review", group: "read", name: "Günün vurgu tekrarı", desc: "Aralıklı tekrar: eski vurgularınızdan her gün birkaçı yeniden önünüze gelir.", run: () => Hafif.load("hub").open("review") },
+			{ id: "readingStats", group: "read", name: "Okuma istatistikleri", desc: "Hangi eseri ne kadar okudunuz, ilerleme, son okuma; son iki haftanın günlük okuması.", run: () => Hafif.load("hub").open("reading") },
 			{ id: "markToRead", group: "read", items: true, auto: true, name: "Okunacak olarak işaretle", desc: "Okunacak etiketini ekler; okunuyor/okundu etiketlerini kaldırır.", run: (c) => A.readState(c.items, "toRead") },
 			{ id: "markReading", group: "read", items: true, auto: true, name: "Okunuyor olarak işaretle", desc: "Okunuyor etiketini ekler; okunacak/okundu etiketlerini kaldırır.", run: (c) => A.readState(c.items, "reading") },
 			{ id: "markRead", group: "read", items: true, auto: true, name: "Okundu olarak işaretle", desc: "Okundu etiketini ekler; okunacak/okunuyor etiketlerini kaldırır.", run: (c) => A.readState(c.items, "read") },
@@ -68,7 +91,7 @@ Hafif.modules.actions = {
 			{ id: "copyCitation", group: "copy", items: true, name: "Dipnot/atıf olarak kopyala", desc: "Seçili kayıtların atfı.", run: (c) => A.copyCite(c.items, true) },
 			{ id: "copyLink", group: "copy", items: true, name: "Zotero bağlantısını kopyala", desc: "zotero://select bağlantısı: Word, Obsidian ya da notlarda tıklayınca kayıt seçilir.", run: (c) => A.copyLinks(c.items, "select") },
 			{ id: "copyPDFLink", group: "copy", items: true, name: "PDF açma bağlantısını kopyala", desc: "zotero://open-pdf bağlantısı; okuyucuda açıksa bulunduğunuz sayfayla.", run: (c) => A.copyLinks(c.items, "pdf", c.reader) },
-			{ id: "showFile", group: "copy", items: true, name: "Dosyayı Finder'da göster", desc: "İlk ekin dosyasını Finder'da gösterir.", run: (c) => A.showFile(c) },
+			{ id: "showFile", group: "copy", items: true, name: `Dosyayı ${Hafif.load("compat").fileManagerName()} içinde göster`, desc: "İlk ekin dosyasını bilgisayarınızdaki klasöründe gösterir.", run: (c) => A.showFile(c) },
 
 			// Düzen
 			{ id: "toCollection", group: "org", items: true, name: "Yeni koleksiyona koy…", desc: "Ad verdiğiniz yeni bir koleksiyon kurar ve seçili kayıtları içine ekler.", run: (c) => A.toNewCollection(c) },
@@ -103,7 +126,7 @@ Hafif.modules.actions = {
 		}
 	},
 
-	DEFAULT_KEYS: { aiChat: "accel+J", litSearch: "accel+alt+L", focus: "accel+alt+F", leftPane: "accel+alt+ArrowLeft", rightPane: "accel+alt+ArrowRight", palette: "accel+shift+K" },
+	DEFAULT_KEYS: { projectSwitch: "accel+alt+P", aiChat: "accel+J", litSearch: "accel+alt+L", focus: "accel+alt+F", leftPane: "accel+alt+ArrowLeft", rightPane: "accel+alt+ArrowRight", palette: "accel+shift+K" },
 
 	/** Kayıtlı kısayollar varsayılanların üstüne yazılır; silinen kısayol "" olarak saklanır. */
 	keys() { return Object.assign({}, this.DEFAULT_KEYS, this._json("actionKeys", {})); },
@@ -215,6 +238,57 @@ Hafif.modules.actions = {
 		});
 	},
 
+	MATRIX: "Araştırma sorusu; Yöntem ve kaynaklar; Temel bulgular / tez; Katkısı; Eksik ya da tartışmalı yönü",
+
+	aiMatrix(c) {
+		let items = this._regular(c.items);
+		if (items.length < 2 && c.collection) items = c.collection.getChildItems(false, false).filter(i => i.isRegularItem());
+		if (!items.length) return Hafif.toast("Kayıt seçin ya da bir koleksiyon açın.");
+		if (items.length > 40) {
+			if (!Services.prompt.confirm(c.win, "Literatür tarama matrisi", `${items.length} kayıt var; ilk 40'ı alınsın mı? (Her kayıt ayrı ayrı okunur.)`)) return;
+			items = items.slice(0, 40);
+		}
+		let cols = this._prompt(c.win, "Literatür tarama matrisi", `${items.length} kayıt. Sütunları noktalı virgülle ayırın:`, this.MATRIX);
+		if (!cols) return;
+		let list = cols.split(/[;\n]/).map(s => s.trim()).filter(Boolean);
+		Hafif.load("chat").show(c.win, {
+			prompt: `Literatür tarama matrisi: şu ${items.length} kaydı build_table ile karşılaştır (keys: ${items.map(i => i.key).join(", ")}). Sütunlar: ${list.join(" | ")}. Tabloyu göster; ardından literatürdeki ana eğilimleri, boşlukları ve bu boşluklardan çıkabilecek araştırma sorularını kısaca yaz.`,
+			send: true,
+		});
+	},
+
+	async related({ win, items }) {
+		let E = Hafif.load("embed");
+		if (!E.config()) return Hafif.toast("Önce anlamsal dizini kurun (Ayarlar › Hafif › Yapay zekâ › Anlamsal arama dizini).", 5000);
+		let src = items[0];
+		let text = src.isNote()
+			? Hafif.load("notedoc")._parse(src.getNote()).body.textContent
+			: [src.getField("title"), src.getField("abstractNote")].filter(Boolean).join("\n");
+		text = text.replace(/\s+/g, " ").trim().slice(0, 2000);
+		if (text.length < 20) return Hafif.toast("İçerik çok kısa.");
+		let r = await E.search(text, { limit: 20, libraryID: src.libraryID });
+		if (r.error) return Hafif.toast(r.error, 5000);
+		let self = src.isNote() ? src.parentItem?.key || src.key : src.key;
+		let entries = [];
+		for (let g of r.results || []) {
+			if (g.item === self) continue;
+			let it = Zotero.Items.getByLibraryAndKey(g.lib, g.item);
+			if (!it) continue;
+			let hit = g.hits[0];
+			let where = hit.kind === "note" ? "not" : hit.page ? `s. ${hit.page}` : "künye/özet";
+			entries.push({ title: it.getDisplayTitle(), meta: `${Math.round(g.score * 100)}% · ${where} · ${(hit.text || "").slice(0, 120)}`, data: { it, hit } });
+		}
+		if (!entries.length) return Hafif.toast("Anlamca yakın kayıt bulunamadı.");
+		let pick = await this._pick(win, `“${(src.isNote() ? src.getNoteTitle() : src.getDisplayTitle()).slice(0, 60)}” ile anlamca ilgili`, entries);
+		if (!pick) return;
+		if (pick.hit.kind !== "note" && pick.hit.att && pick.hit.page) {
+			let att = Zotero.Items.getByLibraryAndKey(pick.it.libraryID, pick.hit.att);
+			if (att) return Zotero.Reader.open(att.id, { pageIndex: Math.max(0, +pick.hit.page - 1) });
+		}
+		win.Zotero_Tabs.select("zotero-pane");
+		await win.ZoteroPane.selectItem(pick.it.id);
+	},
+
 	// ---- Görünüm ----
 
 	fullscreen(win) {
@@ -255,11 +329,11 @@ Hafif.modules.actions = {
 	},
 
 	_readerSidebarOpen(reader) {
-		return !!reader?._internalReader?._state?.sidebarOpen;
+		return Hafif.load("compat").readerSidebarOpen(reader);
 	},
 
 	_setReaderSidebar(reader, open) {
-		reader?._internalReader?.toggleSidebar(open);
+		Hafif.load("compat").toggleReaderSidebar(reader, open);
 	},
 
 	leftPane(win) {
@@ -304,6 +378,49 @@ Hafif.modules.actions = {
 		if (reader) this._setReaderSidebar(reader, false);
 		let key = this.prettyKey(this.keys().focus);
 		Hafif.toast("Odak modu" + (key ? ` — çıkmak için ${key}` : ""), 1800);
+	},
+
+	/** İki eseri yan yana açar: ana pencere solda, ikinci eser ayrı okuyucu penceresinde sağda. */
+	async sideBySide({ win, items, reader }) {
+		let pdfOf = (it) => {
+			if (!it) return null;
+			if (it.isFileAttachment?.()) return it;
+			let id = it.getAttachments?.().find(a => Zotero.Items.get(a)?.isFileAttachment());
+			return id ? Zotero.Items.get(id) : null;
+		};
+		let tops = this._regular(items);
+		let first = reader ? Zotero.Items.get(reader.itemID) : pdfOf(tops[0]);
+		let second = reader ? null : pdfOf(tops[1]);
+		if (!second) {
+			let tabs = (win.Zotero_Tabs?._tabs || []).filter(t => t.type?.startsWith("reader") && t.data?.itemID && t.data.itemID !== first?.id);
+			let entries = tabs.map(t => ({ title: t.title, meta: "açık sekme", data: Zotero.Items.get(t.data.itemID) }));
+			let col = win.ZoteroPane?.getSelectedCollection?.();
+			for (let it of (col ? col.getChildItems(false, false) : []).filter(i => i.isRegularItem())) {
+				let p = pdfOf(it);
+				if (p && p.id !== first?.id && !entries.some(e => e.data?.id === p.id)) entries.push({ title: it.getDisplayTitle(), meta: col.name, data: p });
+			}
+			if (!entries.length) return Hafif.toast("Yan yana açmak için iki kayıt seçin ya da ikinci eseri bir sekmede açın.", 4000);
+			second = await this._pick(win, "Yanına hangi eser açılsın?", entries);
+			if (!second) return;
+		}
+		if (!first) return Hafif.toast("Açık ya da seçili bir PDF yok.");
+		let scr = win.screen;
+		let half = Math.floor(scr.availWidth / 2);
+		win.fullScreen = false;
+		win.moveTo(scr.availLeft, scr.availTop);
+		win.resizeTo(half, scr.availHeight);
+		if (!reader) await Zotero.Reader.open(first.id);
+		let r2 = await Zotero.Reader.open(second.id, null, { openInWindow: true });
+		let w2 = Hafif.load("compat").readerWindow(r2);
+		if (w2) {
+			let place = () => {
+				w2.moveTo(scr.availLeft + half, scr.availTop);
+				w2.resizeTo(scr.availWidth - half, scr.availHeight);
+			};
+			if (w2.document.readyState === "complete") place();
+			else w2.addEventListener("load", place, { once: true });
+			w2.setTimeout(place, 400);
+		}
 	},
 
 	// ---- Etiketler ----
@@ -620,7 +737,7 @@ Hafif.modules.actions = {
 			else {
 				let att = reader ? Zotero.Items.get(reader.itemID) : Zotero.Items.get(it.getAttachments().find(id => Zotero.Items.get(id)?.isPDFAttachment()));
 				if (!att) continue;
-				let page = reader?._internalReader?._state?.primaryViewStats?.pageIndex;
+				let page = reader ? Hafif.load("compat").readerPage(reader)?.index : null;
 				links.push(`zotero://open-pdf/${this._libPath(att)}/items/${att.key}` + (page != null ? `?page=${page + 1}` : ""));
 			}
 		}

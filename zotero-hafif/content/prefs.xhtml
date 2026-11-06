@@ -47,6 +47,7 @@
 	</html:style>
 
 	<html:p class="hf-intro">Hafif'in bütün ayarları burada. Değişiklikler hemen kaydedilir; Zotero'yu yeniden başlatmak gerekmez.</html:p>
+	<html:div class="hf-row"><html:input id="hafif-pref-search" type="search" placeholder="Ayarlarda ara… (ör. kısayol, renk, anahtar, okuma)" style="flex: 1"/></html:div>
 	<html:div class="hf-nav" id="hafif-nav"></html:div>
 
 	<!-- Eylemler ve kısayollar -->
@@ -80,6 +81,25 @@
 			<html:label for="hafif-tag-reading">Okunuyor</html:label><html:input id="hafif-tag-reading"/>
 			<html:label for="hafif-tag-read">Okundu</html:label><html:input id="hafif-tag-read"/>
 		</html:div>
+	</html:section>
+
+	<!-- Okuma -->
+	<html:section class="hf-card" id="hf-sec-reading" data-title="Okuma ve vurgular">
+		<html:h2>❖ Okuma ve vurgular</html:h2>
+		<html:p class="hf-lead">Renklerin sizin için ne anlama geldiği vurgu panosunda, nota gönderilen alıntılarda ({{meaning}}) ve asistanın vurgu aramalarında kullanılır. Okuma takibi hangi eseri ne kadar okuduğunuzu yalnızca bu bilgisayarda tutar.</html:p>
+		<html:div class="hf-sub">Renk anlamları</html:div>
+		<html:div class="hf-tags" id="hafif-colors"></html:div>
+		<html:div class="hf-sub">Okuma takibi</html:div>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingTrack"/><html:span>Okuma süresini ve görülen sayfaları kaydet <html:span class="hf-help">(Zotero öndeyken ve son iki dakikada etkinseniz; veri: Zotero veri klasörü › hafif/reading.json)</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingSection"/><html:span>Sağ panelde “Okuma” bölümünü göster <html:span class="hf-help">(Zotero yeniden başlayınca)</html:span></html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingAutoState"/><html:span>%10'u okununca “okunuyor” etiketini kendiliğinden ver</html:span></html:label>
+		<html:label class="hf-check"><html:input type="checkbox" id="hafif-readingAutoRead"/><html:span>%95'i okununca “okundu” etiketini kendiliğinden ver</html:span></html:label>
+		<html:div class="hf-sub">Vurgu tekrarı</html:div>
+		<html:div class="hf-row">
+			<html:label for="hafif-reviewNew">Günde yeni vurgu</html:label>
+			<html:input id="hafif-reviewNew" type="number" min="0" max="100" style="width: 5em"/>
+		</html:div>
+		<html:div class="hf-help">Hatırladığınız vurgular 1, 3, 7, 16 ve 35 gün sonra yeniden gelir; hatırlamadıklarınız ertesi gün.</html:div>
 	</html:section>
 
 	<!-- MCP -->
@@ -120,7 +140,7 @@
 
 		<html:div class="hf-sub">Alıntı biçimi</html:div>
 		<html:textarea id="hafif-quoteTemplate"></html:textarea>
-		<html:div class="hf-help">Kullanılabilenler: {{highlight}} vurgulanan metin, {{citation}} atıf, {{comment}} yorumunuz, {{tags}}, {{color}}. Koşul: {{if comment}}…{{endif}}. <html:a id="hafif-quote-reset" href="#">Varsayılana dön</html:a></html:div>
+		<html:div class="hf-help">Kullanılabilenler: {{highlight}} vurgulanan metin, {{citation}} atıf, {{comment}} yorumunuz, {{tags}}, {{color}}, {{meaning}} rengin anlamı. Koşul: {{if comment}}…{{endif}}. <html:a id="hafif-quote-reset" href="#">Varsayılana dön</html:a></html:div>
 
 		<html:div class="hf-sub">Not şablonları</html:div>
 		<html:div class="hf-help">Araçlar › Şablondan yeni not ile kullanılır. {{başlık}} ve {{tarih}} doldurulur.</html:div>
@@ -219,6 +239,11 @@
 		<html:div id="hafif-custom"></html:div>
 		<html:div class="hf-row"><html:button id="hafif-custom-add">＋ Uç nokta ekle</html:button></html:div>
 
+		<html:div class="hf-sub">Kullanım ve maliyet</html:div>
+		<html:div class="hf-help">Her model çağrısının belirteç (token) sayıları bu bilgisayarda aylık toplanır. Tahmini tutar için modelin 1 milyon belirteç başına giriş ve çıkış fiyatını (ABD doları) yazın; fiyatlar sağlayıcının sitesinde.</html:div>
+		<html:div class="hf-row"><html:select id="hafif-usageMonth"></html:select><html:span id="hafif-usageTotal" class="hf-ok"></html:span></html:div>
+		<html:div id="hafif-usage"></html:div>
+
 		<html:div class="hf-sub">Anlamsal arama dizini</html:div>
 		<html:div class="hf-help">Asistanın kelimesi geçmese de anlamca ilgili kaynakları (başka dildeki karşılıklarıyla) bulabilmesi için kütüphanenizin bir “anlam dizini” bu bilgisayarda kurulur. Metinler yalnızca bir kez, seçtiğiniz sağlayıcıya gömülmek için gider; arama tamamen yerelde yapılır. Türkçe/Arapça için çok dilli bir model seçin: Ollama'da <html:b>bge-m3</html:b> (ücretsiz, yerel), Gemini, OpenAI ya da Voyage.</html:div>
 		<html:div class="hf-row">
@@ -238,6 +263,10 @@
 		<html:div class="hf-sub">Dış literatür</html:div>
 		<html:label class="hf-check"><html:input type="checkbox" id="hafif-aiExternal"/><html:span>Gerektiğinde kütüphane dışındaki literatürde ara <html:span class="hf-help">(OpenAlex: 250 milyonu aşkın akademik eser, atıf ağı ve açık erişim bağlantıları; ücretsiz, anahtar gerekmez. Yalnızca arama sözcükleri gönderilir.)</html:span></html:span></html:label>
 
+		<html:div class="hf-sub">Araştırmacı profili</html:div>
+		<html:textarea id="hafif-aiProfile" style="font-family: inherit; min-height: 50px"></html:textarea>
+		<html:div class="hf-help">Asistan sizi bu tanımla tanır: alanınız, çalıştığınız diller, kütüphanenizin içeriği. Boş bırakırsanız varsayılan (İslâm ilimleri) kullanılır.</html:div>
+
 		<html:div class="hf-sub">Kalıcı talimatlar</html:div>
 		<html:textarea id="hafif-aiInstructions" placeholder="Ör. Atıfları İSNAD 2. edisyona göre ver. Arapça alıntıların Türkçe çevirisini de ekle. Hicrî tarihleri miladî karşılıklarıyla yaz." style="font-family: inherit; min-height: 70px"></html:textarea>
 		<html:div class="hf-help">Her sohbette asistana verilir.</html:div>
@@ -253,5 +282,10 @@
 			<html:span id="hafif-io-msg" class="hf-ok"></html:span>
 		</html:div>
 		<html:div class="hf-help">Dışa aktarma bütün Hafif ayarlarını (API anahtarı hariç) panoya JSON olarak kopyalar; başka bilgisayara taşımak ya da yedeklemek için.</html:div>
+		<html:div class="hf-row">
+			<html:button id="hafif-perf">Performans raporu</html:button>
+		</html:div>
+		<html:pre id="hafif-perf-out" class="hf-help" style="white-space: pre-wrap; font-family: ui-monospace, Menlo, monospace" hidden="true"></html:pre>
+		<html:div class="hf-help">API anahtarları Zotero'nun parola yöneticisinde saklanır (ayar dosyasında açık metin olarak durmaz).</html:div>
 	</html:section>
 </vbox>

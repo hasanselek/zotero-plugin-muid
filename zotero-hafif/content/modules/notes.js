@@ -155,7 +155,7 @@ Hafif.modules.notes = {
 			...annotation,
 			type: "highlight",
 			color: annotation.color || "#ffd400",
-			attachmentItemID: reader._item.id,
+			attachmentItemID: Hafif.load("compat").readerItem(reader).id,
 			id: Zotero.DataObjectUtilities.generateKey(),
 		};
 		return this._enqueue(target, async () => [json]);
@@ -353,9 +353,27 @@ Hafif.modules.notes = {
 	_serialize(jsons) {
 		let key = "annotations.noteTemplates.highlight";
 		let original = Zotero.Prefs.get(key);
+		let tpl = Hafif.pref("quoteTemplate") || original;
 		try {
-			Zotero.Prefs.set(key, Hafif.pref("quoteTemplate") || original);
-			return Zotero.EditorInstanceUtilities.serializeAnnotations(jsons, true);
+			// {{meaning}}: rengin anlamı (Ayarlar › Okuma › Renk anlamları). Zotero bu değişkeni
+			// tanımadığı için vurgular aynı renkli gruplar hâlinde, anlam yerleştirilerek serileştirilir.
+			if (!/\{\{meaning\}\}/.test(tpl || "")) {
+				Zotero.Prefs.set(key, tpl);
+				return Zotero.EditorInstanceUtilities.serializeAnnotations(jsons, true);
+			}
+			let A = Hafif.load("annots");
+			let html = "";
+			let citationItems = [];
+			for (let i = 0; i < jsons.length;) {
+				let j = i;
+				while (j < jsons.length && jsons[j].color === jsons[i].color) j++;
+				Zotero.Prefs.set(key, tpl.replace(/\{\{meaning\}\}/g, this._esc(A.meaning(jsons[i].color))));
+				let r = Zotero.EditorInstanceUtilities.serializeAnnotations(jsons.slice(i, j), true);
+				html += r.html;
+				for (let c of r.citationItems || []) if (!citationItems.some(x => x.uris.some(u => c.uris.includes(u)))) citationItems.push(c);
+				i = j;
+			}
+			return { html, citationItems };
 		}
 		finally {
 			Zotero.Prefs.set(key, original);

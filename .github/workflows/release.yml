@@ -1,0 +1,36 @@
+# Sürüm çıkarmak: manifest.json'daki sürümü artırın, commit'leyin, sonra
+#   git tag v1.2.3 && git push origin v1.2.3
+# Bu iş akışı .xpi'yi ve Zotero'nun otomatik güncelleme dosyasını (updates.json) sürüme ekler.
+name: Release
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check && npm run lint && npm test
+      - name: Sürüm etiketle uyuşuyor mu
+        run: |
+          V=$(node -p "require('./zotero-hafif/manifest.json').version")
+          test "v$V" = "${GITHUB_REF_NAME}" || { echo "manifest $V, etiket ${GITHUB_REF_NAME}"; exit 1; }
+      - id: build
+        run: echo "xpi=$(sh zotero-hafif/build.sh)" >> "$GITHUB_OUTPUT"
+      - run: |
+          node scripts/update-manifest.mjs \
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/$(basename ${{ steps.build.outputs.xpi }})" \
+            "zotero-hafif/${{ steps.build.outputs.xpi }}" > updates.json
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            zotero-hafif/${{ steps.build.outputs.xpi }}
+            updates.json
+          generate_release_notes: true

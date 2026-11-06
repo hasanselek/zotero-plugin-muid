@@ -183,7 +183,7 @@ Hafif.modules.tables = {
 		for (let p = start; p <= end; p++) if (a.force || !(pages[p - 1] || "").trim()) todo.push(p);
 		todo = todo.slice(0, 40);
 		if (!todo.length) return "Bu aralıktaki sayfaların zaten metni var (force ile yeniden okutulabilir).";
-		let { provider, model } = Hafif.load("llm").current();
+		let { model } = Hafif.load("llm").current();
 		let ok = await ctx.approve?.({
 			title: `${T._labelFor(att.key)} — ${todo.length} sayfa OCR ile metne çevrilecek`,
 			items: [{ text: `Sayfalar: ${this._ranges(todo)}`, meta: `Model: ${model} — her sayfa bir görsel istek; ücretli modelde maliyeti olur` }],

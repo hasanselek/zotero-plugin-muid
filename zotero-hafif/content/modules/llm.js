@@ -53,19 +53,38 @@ Hafif.modules.llm = {
 		}
 	},
 
+	/** Sağlayıcı anahtarları: parola yöneticisindekiler, taşınamamış eski ayarların üstüne. */
 	keys() {
 		let k = this._json("aiKeys", {});
 		// Eski tek anahtar ayarı
 		if (!k.anthropic && Hafif.pref("aiKey")) k.anthropic = Hafif.pref("aiKey");
+		for (let [name, v] of Object.entries(Hafif.load("secrets").all())) {
+			if (name.startsWith("provider:") && v) k[name.slice(9)] = v;
+		}
 		return k;
 	},
 
-	setKey(provider, value) {
+	async setKey(provider, value) {
+		let S = Hafif.load("secrets");
 		let k = this._json("aiKeys", {});
-		if (value) k[provider] = value;
+		if (await S.set("provider:" + provider, value)) {
+			delete k[provider];
+			if (provider === "anthropic") Hafif.pref("aiKey", "");
+		}
+		else if (value) k[provider] = value;
 		else delete k[provider];
-		Hafif.pref("aiKeys", JSON.stringify(k));
-		if (provider === "anthropic") Hafif.pref("aiKey", value || "");
+		Hafif.pref("aiKeys", Object.keys(k).length ? JSON.stringify(k) : "");
+	},
+
+	customKey(c) {
+		return Hafif.load("secrets").get("custom:" + c.id) || c.key || "";
+	},
+
+	/** Özel uç noktanın anahtarı; kaydedilemezse eski yerinde (aiCustom) kalır. */
+	async setCustomKey(c, value) {
+		if (await Hafif.load("secrets").set("custom:" + c.id, value)) c.key = "";
+		else c.key = value;
+		c.hasKey = !!value;
 	},
 
 	bases() {
@@ -82,7 +101,7 @@ Hafif.modules.llm = {
 		let p = this.PROVIDERS[id];
 		if (p) return { id, ...p, base: (this.bases()[id] || p.base).replace(/\/+$/, ""), apiKey: this.keys()[id] || "" };
 		let c = this.custom().find(x => x.id === id);
-		if (c) return { id, label: c.label || c.base, format: c.format || "openai", base: (c.base || "").replace(/\/+$/, ""), key: !!c.key, apiKey: c.key || "", custom: true };
+		if (c) return { id, label: c.label || c.base, format: c.format || "openai", base: (c.base || "").replace(/\/+$/, ""), key: !!(c.hasKey || c.key), apiKey: this.customKey(c), custom: true };
 		return null;
 	},
 
@@ -188,9 +207,11 @@ Hafif.modules.llm = {
 		let p = this.provider(opts.provider);
 		if (!p) throw new Error("Sağlayıcı bulunamadı: " + opts.provider);
 		if (p.key && !p.apiKey && !p.custom) throw new Error(`${p.label} için API anahtarı yok. Zotero Ayarları › Hafif › Yapay zekâ bölümünden girin.`);
-		if (p.format === "anthropic") return this._anthropic(p, opts);
-		if (p.format === "gemini") return this._gemini(p, opts);
-		return this._openai(p, opts);
+		let res = p.format === "anthropic" ? await this._anthropic(p, opts)
+			: p.format === "gemini" ? await this._gemini(p, opts)
+				: await this._openai(p, opts);
+		Hafif.load("usage").record(p.id, opts.model, res?.usage);
+		return res;
 	},
 
 	/** SSE akışını satır satır okur; her "data:" yükü için fn(json, eventName) çağrılır. */
@@ -556,7 +577,6 @@ Hafif.modules.llm = {
 	/** Bağlantı denemesi: model listesi çekilebiliyorsa anahtar ve adres doğrudur. */
 	async test(providerID) {
 		if (this.PROVIDERS[providerID]?.embedOnly) {
-			let p = this.provider(providerID);
 			await Hafif.load("embed").embed(["deneme"], { cfg: { provider: providerID, model: Hafif.load("embed").DEFAULTS[providerID]?.model, dims: null } });
 			return "Bağlantı çalışıyor.";
 		}

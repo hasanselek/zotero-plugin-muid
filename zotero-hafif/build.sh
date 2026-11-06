@@ -1,5 +1,5 @@
 #!/bin/sh
-# Eklentiyi dist/ altında .xpi olarak paketler.
+# Eklentiyi dist/ altında .xpi olarak paketler (dist/ depoya girmez; sürümler GitHub Releases'te).
 set -e
 cd "$(dirname "$0")"
 VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' manifest.json | head -1)
